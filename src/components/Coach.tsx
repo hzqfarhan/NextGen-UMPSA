@@ -65,6 +65,111 @@ export function Coach() {
   // Platform selection state for Finance Strategist
   const [selectedPlatform, setSelectedPlatform] = useState<number | null>(null)
 
+  // ─── AI Function Call Handler ──────────────────────────────────────────────
+  // Executes a Gemini function call response against the Zustand store
+  const executeGeminiFunctionCall = (fnCall: { name: string; args: any }): { success: boolean; message: string; redirect?: { label: string; href: string }; proposal?: any } => {
+    const store = useStore.getState();
+    try {
+      switch (fnCall.name) {
+        case 'createSavingsPocket': {
+          const deposit = fnCall.args.deposit || 0;
+          const mode = fnCall.args.mode || 'savings';
+          const riskLevel = mode === 'growth' ? 'medium' : 'low';
+          addSavingsPocket({
+            id: Math.random().toString(36).substring(2, 11),
+            name: fnCall.args.name,
+            target: fnCall.args.target,
+            current: deposit,
+            icon: '💰',
+            mode: mode as 'savings' | 'growth',
+            riskLevel: riskLevel as 'low' | 'medium',
+          });
+          useStore.setState({ pet: { ...useStore.getState().pet, animation: "happy" } });
+          return {
+            success: true,
+            message: `Done! I've created your "${fnCall.args.name}" pocket with a target of RM ${fnCall.args.target}${deposit > 0 ? ` and an initial deposit of RM ${deposit}` : ''}. Track it in the Savings tab!`,
+            redirect: { label: 'Go to Savings', href: '/savings' },
+            proposal: {
+              type: 'create_pocket',
+              name: fnCall.args.name,
+              target: fnCall.args.target,
+              current: deposit,
+              icon: '💰',
+              mode,
+              riskLevel,
+            }
+          };
+        }
+        case 'addFundsToPocket': {
+          const pocket = store.savingsPockets.find(p =>
+            p.name.toLowerCase().includes(fnCall.args.pocketName.toLowerCase())
+          );
+          if (!pocket) {
+            return { success: false, message: `I couldn't find a pocket named "${fnCall.args.pocketName}". Try listing your pockets first!` };
+          }
+          store.addFundsToPocket(pocket.id, fnCall.args.amount);
+          useStore.setState({ pet: { ...useStore.getState().pet, animation: "excited" } });
+          return {
+            success: true,
+            message: `Successfully deposited RM ${fnCall.args.amount.toFixed(2)} into your ${pocket.name}!`,
+            redirect: { label: 'Go to Savings', href: '/savings' },
+            proposal: {
+              type: 'add_funds',
+              pocketId: pocket.id,
+              pocketName: pocket.name,
+              amount: fnCall.args.amount,
+              icon: pocket.icon,
+            }
+          };
+        }
+        case 'toggleSpendGuard': {
+          const shouldEnable = fnCall.args.enable;
+          const currentlyActive = store.isSpendGuardActive;
+          if (shouldEnable !== currentlyActive) {
+            store.toggleSpendGuard();
+          }
+          useStore.setState({ pet: { ...useStore.getState().pet, animation: shouldEnable ? "happy" : "idle" } });
+          return {
+            success: true,
+            message: shouldEnable
+              ? 'Spend Guard is now ON. Your daily spending will be capped to keep you on track.'
+              : 'Spend Guard is now OFF. Stay mindful of your spending!',
+          };
+        }
+        default:
+          return { success: false, message: `Unknown function: ${fnCall.name}` };
+      }
+    } catch (error: any) {
+      useStore.setState({ pet: { ...useStore.getState().pet, animation: "angry" } });
+      return { success: false, message: `Action blocked: ${error.message}` };
+    }
+  };
+
+  // ─── Chat Logging Helper ───────────────────────────────────────────────────
+  // Fire-and-forget POST to /api/chat/log (only works when DATABASE_URL is set)
+  const logChat = (agentId: string, message: string, response: string, functionCalled?: string) => {
+    fetch('/api/chat/log', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        user_name: user.name,
+        agent_id: agentId,
+        message,
+        response,
+        function_called: functionCalled || null,
+      }),
+    }).catch(() => { /* silently ignore logging failures */ });
+  };
+
+  // ─── Build user context for AI requests ────────────────────────────────────
+  const buildAIContext = () => ({
+    balance: user.currentBalance,
+    safeDailySpend,
+    resilienceScore,
+    isSpendGuardActive: useStore.getState().isSpendGuardActive,
+    savingsPockets: savingsPockets.map(p => ({ name: p.name, current: p.current, target: p.target })),
+  });
+
   // Auto-scroll to bottom whenever messages or thinking state changes
   useEffect(() => {
     bottomRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -580,21 +685,46 @@ export function Coach() {
             ]
           })
         } else {
-          // General saving fallback
+          // General saving fallback — with Gemini function calling support
           let agentId = 'save';
           let agentName = 'Savings Sentinel';
           try {
             const res = await fetch('/api/chat', {
               method: 'POST',
               headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ message: overrideText || input, agentId })
+              body: JSON.stringify({ message: overrideText || input, agentId, context: buildAIContext() })
             });
             const data = await res.json();
-            responses.push({
-              role: 'assistant',
-              agent: agentName,
-              content: data.reply || "I'm having trouble analyzing your savings goals right now. Let's try again in a bit."
-            });
+
+            // Handle Gemini function call responses
+            if (data.functionCall) {
+              const result = executeGeminiFunctionCall(data.functionCall);
+              const replyText = data.reply
+                ? `${data.reply}\n\n${result.message}`
+                : result.message;
+              responses.push({
+                role: 'assistant',
+                agent: agentName,
+                content: replyText,
+                redirect: result.redirect,
+                proposal: result.proposal,
+              });
+              logChat(agentId, overrideText || input, replyText, data.functionCall.name);
+            } else if (!data.fallback && data.reply) {
+              responses.push({
+                role: 'assistant',
+                agent: agentName,
+                content: data.reply,
+              });
+              logChat(agentId, overrideText || input, data.reply);
+            } else {
+              // Fallback when no API key or API error
+              responses.push({
+                role: 'assistant',
+                agent: agentName,
+                content: "I'm having trouble analyzing your savings goals right now. Let's try again in a bit."
+              });
+            }
           } catch (err) {
             responses.push({
               role: 'assistant',
@@ -619,14 +749,23 @@ export function Coach() {
           const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: overrideText || input, agentId })
+            body: JSON.stringify({ message: overrideText || input, agentId, context: buildAIContext() })
           });
           const data = await res.json();
-          responses.push({
-            role: 'assistant',
-            agent: agentName,
-            content: data.reply || "I'm having trouble analyzing your investments right now. Let's try again in a bit."
-          });
+          if (!data.fallback && data.reply) {
+            responses.push({
+              role: 'assistant',
+              agent: agentName,
+              content: data.reply,
+            });
+            logChat(agentId, overrideText || input, data.reply);
+          } else {
+            responses.push({
+              role: 'assistant',
+              agent: agentName,
+              content: "I'm having trouble analyzing your investments right now. Let's try again in a bit."
+            });
+          }
         } catch (err) {
           responses.push({
             role: 'assistant',
@@ -641,14 +780,38 @@ export function Coach() {
           const res = await fetch('/api/chat', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ message: overrideText || input, agentId })
+            body: JSON.stringify({ message: overrideText || input, agentId, context: buildAIContext() })
           });
           const data = await res.json();
-          responses.push({
-            role: 'assistant',
-            agent: agentName,
-            content: data.reply || `Based on your current balance of RM ${user.currentBalance.toFixed(2)}, your absolute safe limit for today is RM ${safeDailySpend.toFixed(2)}.`
-          });
+
+          // Handle Gemini function call responses (Finance Strategist also has tool access)
+          if (data.functionCall) {
+            const result = executeGeminiFunctionCall(data.functionCall);
+            const replyText = data.reply
+              ? `${data.reply}\n\n${result.message}`
+              : result.message;
+            responses.push({
+              role: 'assistant',
+              agent: agentName,
+              content: replyText,
+              redirect: result.redirect,
+              proposal: result.proposal,
+            });
+            logChat(agentId, overrideText || input, replyText, data.functionCall.name);
+          } else if (!data.fallback && data.reply) {
+            responses.push({
+              role: 'assistant',
+              agent: agentName,
+              content: data.reply,
+            });
+            logChat(agentId, overrideText || input, data.reply);
+          } else {
+            responses.push({
+              role: 'assistant',
+              agent: agentName,
+              content: `Based on your current balance of RM ${user.currentBalance.toFixed(2)}, your absolute safe limit for today is RM ${safeDailySpend.toFixed(2)}.`
+            });
+          }
         } catch (err) {
           responses.push({
             role: 'assistant',
