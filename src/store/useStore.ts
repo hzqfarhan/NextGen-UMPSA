@@ -541,9 +541,9 @@ const useStoreBase = create<NextGenState>()(
             .reduce((sum, t) => sum + t.amount, 0);
           const totalSavedToday = preSavingTx + amount;
 
-          const isFirstTimeMeetingQuota = totalSavedToday >= 5.0 && preSavingTx < 5.0;
+          const isFirstTimeMeetingQuota = totalSavedToday >= 1.0 && preSavingTx < 1.0;
           const petMessage = isFirstTimeMeetingQuota
-            ? `Awesome save! You've met today's savings quota of RM 5.00 and protected your streak! 🔥`
+            ? `Awesome save! You've met today's savings quota of RM 1.00 and protected your streak! 🔥`
             : `Nice save! Moving RM ${amount.toFixed(2)} to ${pocketName}. Your daily quota remains stable for today, and your NextGen Score is fully protected!`;
 
           const petAnimation = isFirstTimeMeetingQuota ? "excited" : "happy";
@@ -842,19 +842,19 @@ const useStoreBase = create<NextGenState>()(
         let petAnimation = 'idle';
         let petMessage = '';
 
-        if (todaySavings >= 5.0) {
+        if (todaySavings >= 1.0) {
           streakUpdated += 1;
           petAnimation = 'excited';
-          petMessage = `Awesome! You successfully saved RM ${todaySavings.toFixed(2)} today (met the RM 5.00 daily quota). Your saving streak is now ${streakUpdated} days! 🔥`;
+          petMessage = `Awesome! You successfully saved RM ${todaySavings.toFixed(2)} today (met the RM 1.00 daily quota). Your saving streak is now ${streakUpdated} days! 🔥`;
         } else {
           if (shieldActive) {
             shieldActive = false;
             petAnimation = 'think';
-            petMessage = `You saved only RM ${todaySavings.toFixed(2)} today (missed the RM 5.00 quota), but your Streak Shield protected your streak of ${streakUpdated} days! 🛡️`;
+            petMessage = `You saved only RM ${todaySavings.toFixed(2)} today (missed the RM 1.00 quota), but your Streak Shield protected your streak of ${streakUpdated} days! 🛡️`;
           } else {
             streakUpdated = 0;
             petAnimation = 'sad';
-            petMessage = `Oh no! You saved only RM ${todaySavings.toFixed(2)} today, missing the RM 5.00 daily quota. Your streak has reset to 0. 😿`;
+            petMessage = `Oh no! You saved only RM ${todaySavings.toFixed(2)} today, missing the RM 1.00 daily quota. Your streak has reset to 0. 😿`;
           }
         }
 

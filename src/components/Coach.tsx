@@ -926,7 +926,7 @@ export function Coach() {
                     {/* Streak Pill */}
                     <div className={cn(
                       "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
-                      todaySavings < 5.0 ? "bg-slate-100/80 border-slate-200 text-slate-400 grayscale opacity-70" :
+                      todaySavings < 1.0 ? "bg-slate-100/80 border-slate-200 text-slate-400 grayscale opacity-70" :
                       currentStreak < 7 ? "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]" :
                       currentStreak < 30 ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
                       "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#CC0D5A]"

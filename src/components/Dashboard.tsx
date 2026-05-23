@@ -374,7 +374,7 @@ export function Dashboard() {
                     alt="Streak Icon"
                     className="w-12 h-12 object-contain transition-all duration-500"
                     style={{
-                      filter: todaySavings < 5.0
+                      filter: todaySavings < 1.0
                         ? "grayscale(1) opacity(0.4)"
                         : currentStreak < 7
                           ? "hue-rotate(15deg) saturate(2.5) drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))"

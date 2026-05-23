@@ -194,24 +194,24 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                     </span>
                     <span className={cn(
                       "font-black text-xs",
-                      todaySavings >= 5.0 ? "text-emerald-600" : "text-[#DF0059]"
+                      todaySavings >= 1.0 ? "text-emerald-600" : "text-[#DF0059]"
                     )}>
-                      RM {todaySavings.toFixed(2)} / RM 5.00
+                      RM {todaySavings.toFixed(2)} / RM 1.00
                     </span>
                   </div>
                   <Progress 
-                    value={Math.min(100, (todaySavings / 5.0) * 100)} 
+                    value={Math.min(100, (todaySavings / 1.0) * 100)} 
                     className={cn(
                       "h-2 transition-all duration-500",
-                      todaySavings >= 5.0 
+                      todaySavings >= 1.0 
                         ? "[&_[data-slot=progress-indicator]]:bg-emerald-500 bg-emerald-100" 
                         : "[&_[data-slot=progress-indicator]]:bg-[#DF0059] bg-pink-100"
                     )}
                   />
                   <p className="text-[8.5px] text-slate-500 font-bold text-center mt-1">
-                    {todaySavings >= 5.0 
+                    {todaySavings >= 1.0 
                       ? (language === 'en' ? "✨ Daily quota met! Tap 'Simulate Next Day' on the dashboard to grow your streak!" : "✨ Kuota harian dipenuhi! Ketik 'Simulasi Hari Seterusnya' di papan pemuka untuk tambahkan streak!")
-                      : (language === 'en' ? "💡 Save RM 5.00 or more today to grow your streak tomorrow!" : "💡 Simpan RM 5.00 atau lebih hari ini untuk tingkatkan streak esok!")
+                      : (language === 'en' ? "💡 Save RM 1.00 or more today to grow your streak tomorrow!" : "💡 Simpan RM 1.00 atau lebih hari ini untuk tingkatkan streak esok!")
                     }
                   </p>
                 </div>
