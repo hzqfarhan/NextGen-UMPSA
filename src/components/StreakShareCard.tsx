@@ -1,5 +1,6 @@
 import React, { forwardRef } from 'react';
 import { cn } from "@/lib/utils";
+import { Pet } from "./ui/Pet";
 
 interface StreakShareCardProps {
   currentStreak: number;
@@ -69,6 +70,15 @@ export const StreakShareCard = forwardRef<HTMLDivElement, StreakShareCardProps>(
               Day Streak
             </p>
           </div>
+        </div>
+
+        {/* Companion Pet peaking */}
+        <div className="absolute bottom-[75px] -right-2 pointer-events-none flex items-end justify-center z-10 opacity-95">
+          <Pet 
+            animation={currentStreak === 0 ? 'sad' : currentStreak >= 7 ? 'excited' : 'happy'} 
+            size={112}
+            className="drop-shadow-lg transform rotate-[-5deg] pointer-events-none"
+          />
         </div>
 
         {/* Footer */}

@@ -213,6 +213,7 @@ interface NextGenState {
   streakShieldActive: boolean;
   awfarDrawTickets: number;
   isBimbMigrated: boolean;
+  selectedCompanion: string;
   
   // Actions
   setShowSpendOnly: (val: boolean) => void;
@@ -234,6 +235,7 @@ interface NextGenState {
   simulateGrowth: () => void;
   updateNextGenScore: () => void;
   setLanguage: (lang: Language) => void;
+  setSelectedCompanion: (c: string) => void;
   
   // Gamification Actions
   incrementStreak: () => void;
@@ -242,6 +244,7 @@ interface NextGenState {
   triggerBimbMigration: () => void;
   moveFundsToAwfarNest: (amount: number) => void;
   simulateNextDay: () => void;
+  simulateNextTier: () => void;
   
   // Bills Actions
   addBill: (b: Bill) => void;
@@ -385,6 +388,7 @@ export const initialStoreState = {
   streakShieldActive: false,
   awfarDrawTickets: 0,
   isBimbMigrated: false,
+  selectedCompanion: 'uteh',
   petOffsets: {
     idle: { offsetY: -3.5, scale: 798 },
     walk: { offsetY: -9.2, scale: 802 },
@@ -404,6 +408,7 @@ const useStoreBase = create<NextGenState>()(
   persist(
     (set, get) => ({
       ...initialStoreState,
+      setSelectedCompanion: (c) => set({ selectedCompanion: c }),
       setShowSpendOnly: (val) => set({ showSpendOnly: val }),
       setHideBalance: (val) => set({ hideBalance: val }),
       addTransaction: (t, skipRoundUp = false) => {
@@ -919,6 +924,64 @@ const useStoreBase = create<NextGenState>()(
         get().updateNextGenScore();
         get().checkAndRefreshDailyQuota();
       },
+      simulateNextTier: () => {
+        const state = get();
+        let nextStreak = 0;
+        
+        if (state.currentStreak < 7) {
+          nextStreak = 7;
+        } else if (state.currentStreak < 30) {
+          nextStreak = 30;
+        } else {
+          nextStreak = 0; // reset back
+        }
+
+        let tier: 'Bronze' | 'Silver' | 'Gold' = 'Bronze';
+        if (nextStreak >= 30) {
+          tier = 'Gold';
+        } else if (nextStreak >= 7) {
+          tier = 'Silver';
+        }
+
+        // Add/remove mock transaction for today savings to activate/deactivate the fire
+        let updatedTransactions = [...state.transactions];
+        const todayStr = new Date().toDateString();
+        if (nextStreak > 0) {
+          const alreadySaved = updatedTransactions.some(
+            t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr
+          );
+          if (!alreadySaved) {
+            updatedTransactions.push({
+              id: 'simulated-saving-' + Date.now(),
+              title: 'Simulated Saving (Streak Active)',
+              amount: 1.0,
+              category: 'Saving',
+              date: new Date().toISOString(),
+              type: 'saving'
+            });
+          }
+        } else {
+          // Remove simulated saving transactions for today to let it be gray
+          updatedTransactions = updatedTransactions.filter(
+            t => !(t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
+          );
+        }
+
+        set((s) => ({
+          currentStreak: nextStreak,
+          highestStreak: Math.max(s.highestStreak, nextStreak),
+          membershipTier: tier,
+          transactions: updatedTransactions,
+          pet: {
+            message: nextStreak === 0 
+              ? "Simulated reset! You are back to 0 days. Time to rebuild! 🌱" 
+              : `Fast-forwarded to ${nextStreak} days! You've unlocked the ${tier} Tier! 🎉`,
+            animation: nextStreak === 0 ? "sad" : "excited"
+          }
+        }));
+
+        get().updateNextGenScore();
+      },
       updateNextGenScore: () => {
         set((state) => {
           // 1. Cashflow Safety (50% Weight)
@@ -1178,6 +1241,7 @@ export const useStore = (() => {
       triggerBimbMigration: storeState.triggerBimbMigration,
       moveFundsToAwfarNest: storeState.moveFundsToAwfarNest,
       simulateNextDay: storeState.simulateNextDay,
+      simulateNextTier: storeState.simulateNextTier,
     };
 
     const stateToUse = hydrated

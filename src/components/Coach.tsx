@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe, Flame, Sparkles, Gift } from "lucide-react"
+import { Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe, Flame, Sparkles, Gift, X } from "lucide-react"
 import { RewardsModal } from "./RewardsModal"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -14,6 +14,22 @@ import { cn } from "@/lib/utils"
 import { t } from "@/lib/translations"
 import { Pet } from "@/components/ui/Pet"
 import Link from "next/link"
+
+const COMPANIONS = [
+  { id: 'uteh', name: 'Uteh', tierRequired: 'Bronze', label: 'Novice' },
+  { id: 'zuko', name: 'Zuko', tierRequired: 'Silver', label: 'Pro' },
+  { id: 'oreo', name: 'Oreo', tierRequired: 'Silver', label: 'Pro' },
+  { id: 'oyen', name: 'Oyen', tierRequired: 'Gold', label: 'Legend' },
+  { id: 'yunn', name: 'Yunn', tierRequired: 'Gold', label: 'Legend' },
+  { id: 'lico', name: 'Lico', tierRequired: 'Gold', label: 'Legend' },
+]
+
+function canUnlockCompanion(tierRequired: string, userTier: string) {
+  if (tierRequired === 'Bronze') return true;
+  if (tierRequired === 'Silver') return userTier === 'Silver' || userTier === 'Gold';
+  if (tierRequired === 'Gold') return userTier === 'Gold';
+  return false;
+}
 
 const AGENTS = [
   { id: 'save', name: 'Savings Sentinel', icon: Target, color: 'text-emerald-500', bg: 'bg-emerald-500/10' },
@@ -39,7 +55,7 @@ interface Message {
 }
 
 export function Coach() {
-  const { user, safeDailySpend, initialSafeDaily, transactions, nextGenScore, language, addSavingsPocket, savingsPockets, bills, addTransaction, pet, currentStreak, membershipTier, streakShieldActive, awfarDrawTickets } = useStore()
+  const { user, safeDailySpend, initialSafeDaily, transactions, nextGenScore, language, addSavingsPocket, savingsPockets, bills, addTransaction, pet, currentStreak, membershipTier, streakShieldActive, awfarDrawTickets, selectedCompanion, setSelectedCompanion } = useStore()
   const strings = t[language]
   
   const todayStr = new Date().toDateString();
@@ -57,6 +73,7 @@ export function Coach() {
   const [isExecuting, setIsExecuting] = useState(false)
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showRewardsModal, setShowRewardsModal] = useState(false)
+  const [showCompanionModal, setShowCompanionModal] = useState(false)
 
   // Affordability state
   const [affordItem, setAffordItem] = useState("")
@@ -874,18 +891,63 @@ export function Coach() {
               <h1 className="text-lg font-bold leading-tight text-[#221F20]">{strings.coachHeader}</h1>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-[10px] text-[#727272] uppercase tracking-widest font-bold">Active</p>
+                <p className="text-[10px] text-[#727272] uppercase tracking-widest font-bold">
+                  {COMPANIONS.find(c => c.id === selectedCompanion)?.name || "Uteh"}
+                </p>
               </div>
             </div>
           </div>
-          <Badge variant="outline" className="text-[10px] bg-emerald-500/10 border-emerald-500/20 text-emerald-500 font-bold px-2 py-1">
-            HEALTH: {nextGenScore}%
+          <Badge 
+            variant="outline" 
+            className="text-[10px] bg-emerald-500/10 border-emerald-500/20 text-emerald-500 font-bold px-2 py-1 cursor-pointer hover:bg-emerald-500/20 transition-colors"
+            onClick={() => setShowCompanionModal(true)}
+          >
+            CUSTOM
           </Badge>
         </div>
       </header>
 
       {/* Chat Area — wrapped in relative for the floating button */}
-      <div className="flex-1 overflow-hidden relative z-10">
+      <div className="flex-1 overflow-hidden relative z-10 flex flex-col">
+        {/* Dynamic Streak, Tier, and Rewards Pills (Sticky Top Status Bar) */}
+        <div className="px-4 py-2.5 bg-white/60 backdrop-blur-md border-b border-pink-100/40 shadow-sm shrink-0 z-20">
+          <div className="flex items-center justify-between gap-2 w-full">
+            {/* Streak Pill */}
+            <div className={cn(
+              "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
+              todaySavings < 1.0 ? "bg-slate-100/80 border-slate-200 text-slate-400 grayscale opacity-70" :
+              currentStreak < 7 ? "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]" :
+              currentStreak < 30 ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
+              "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#CC0D5A]"
+            )}>
+              <span>🔥 {currentStreak} {language === 'en' ? 'Day Streak' : 'Hari Streak'}</span>
+            </div>
+
+            {/* Tier Pill */}
+            <div className={cn(
+              "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
+              membershipTier === 'Gold' ? "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#DF0059]" :
+              membershipTier === 'Silver' ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
+              "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]"
+            )}>
+              <span>
+                {membershipTier === 'Gold' ? '🏆 Legend' :
+                 membershipTier === 'Silver' ? '🥈 Pro' :
+                 '🥉 Novice'}
+              </span>
+            </div>
+
+            {/* Rewards & Perks Interactive Pill */}
+            <button 
+              onClick={() => setShowRewardsModal(true)}
+              className="flex-1 px-2.5 py-1.5 rounded-full border bg-gradient-to-r from-[#DF0059]/10 via-[#CC0D5A]/15 to-[#E06E9C]/10 border-[#E06E9C]/30 text-[#CC0D5A] shadow-sm flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold hover:bg-gradient-to-r hover:from-[#DF0059]/20 hover:to-[#CC0D5A]/20 active:scale-95 transition-all cursor-pointer whitespace-nowrap backdrop-blur-md"
+            >
+              <Sparkles className="w-3 h-3 text-[#DF0059] animate-pulse" />
+              <span>{language === 'en' ? 'Rewards & Perks ✨' : 'Ganjaran ✨'}</span>
+            </button>
+          </div>
+        </div>
+
         {/* Scroll-to-bottom floating button */}
         <AnimatePresence>
           {!isAtBottom && (
@@ -907,7 +969,7 @@ export function Coach() {
         <div
           ref={scrollRef}
           onScroll={handleScroll}
-          className="h-full overflow-y-auto px-4 scroll-smooth bg-transparent"
+          className="flex-1 overflow-y-auto px-4 scroll-smooth bg-transparent"
         >
           <div className="space-y-6 py-6 min-h-full flex flex-col">
 
@@ -921,43 +983,6 @@ export function Coach() {
                 className="flex flex-col justify-start h-full pt-2"
               >
                 <div className="mb-8">
-                  {/* Dynamic Streak, Tier, and Rewards Pills */}
-                  <div className="flex items-center justify-between gap-2 mb-6 w-full">
-                    {/* Streak Pill */}
-                    <div className={cn(
-                      "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
-                      todaySavings < 1.0 ? "bg-slate-100/80 border-slate-200 text-slate-400 grayscale opacity-70" :
-                      currentStreak < 7 ? "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]" :
-                      currentStreak < 30 ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
-                      "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#CC0D5A]"
-                    )}>
-                      <span>🔥 {currentStreak} {language === 'en' ? 'Day Streak' : 'Hari Streak'}</span>
-                    </div>
-
-                    {/* Tier Pill */}
-                    <div className={cn(
-                      "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
-                      membershipTier === 'Gold' ? "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#DF0059]" :
-                      membershipTier === 'Silver' ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
-                      "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]"
-                    )}>
-                      <span>
-                        {membershipTier === 'Gold' ? '🏆 Legend' :
-                         membershipTier === 'Silver' ? '🥈 Pro' :
-                         '🥉 Novice'}
-                      </span>
-                    </div>
-
-                    {/* Rewards & Perks Interactive Pill */}
-                    <button 
-                      onClick={() => setShowRewardsModal(true)}
-                      className="flex-1 px-2.5 py-1.5 rounded-full border bg-gradient-to-r from-[#DF0059]/10 via-[#CC0D5A]/15 to-[#E06E9C]/10 border-[#E06E9C]/30 text-[#CC0D5A] shadow-sm flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold hover:bg-gradient-to-r hover:from-[#DF0059]/20 hover:to-[#CC0D5A]/20 active:scale-95 transition-all cursor-pointer whitespace-nowrap backdrop-blur-md"
-                    >
-                      <Sparkles className="w-3 h-3 text-[#DF0059] animate-pulse" />
-                      <span>{language === 'en' ? 'Rewards & Perks ✨' : 'Ganjaran ✨'}</span>
-                    </button>
-                  </div>
-
                   <h2 className="text-xl font-medium text-[#727272] mb-1">Hi {user.name}</h2>
                   <h1 className="text-3xl font-black tracking-tight text-[#221F20]">Where should we start?</h1>
                 </div>
@@ -1740,6 +1765,65 @@ export function Coach() {
           </Button>
         </div>
       </div>
+
+      {showCompanionModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 10 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="w-full max-w-sm bg-white rounded-3xl overflow-hidden shadow-2xl border border-slate-100 flex flex-col"
+          >
+            <div className="p-4 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+              <div>
+                <h3 className="font-bold text-slate-800">Customize Companion</h3>
+                <p className="text-[10px] text-slate-500">Unlock more as you rank up!</p>
+              </div>
+              <Button variant="ghost" size="icon" onClick={() => setShowCompanionModal(false)} className="rounded-full w-8 h-8 text-slate-400 hover:text-slate-600 hover:bg-slate-200/50">
+                <X className="w-4 h-4" />
+              </Button>
+            </div>
+            <div className="p-4 grid grid-cols-2 gap-3 max-h-[60vh] overflow-y-auto">
+              {COMPANIONS.map(c => {
+                const unlocked = canUnlockCompanion(c.tierRequired, membershipTier);
+                const isSelected = selectedCompanion === c.id;
+                return (
+                  <button
+                    key={c.id}
+                    disabled={!unlocked}
+                    onClick={() => {
+                      setSelectedCompanion(c.id);
+                      setShowCompanionModal(false);
+                    }}
+                    className={cn(
+                      "relative flex flex-col items-center gap-2 p-3 rounded-2xl border-2 transition-all duration-300",
+                      isSelected ? "border-emerald-500 bg-emerald-50/50" : unlocked ? "border-slate-100 hover:border-slate-300 hover:bg-slate-50" : "border-slate-100 opacity-50 grayscale cursor-not-allowed bg-slate-50"
+                    )}
+                  >
+                    <div className="w-14 h-14 relative flex items-center justify-center overflow-hidden">
+                      <Pet animation="walk" companionId={c.id} size={56} />
+                    </div>
+                    <div className="text-center w-full">
+                      <p className="text-sm font-black text-slate-800">{c.name}</p>
+                      <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1 inline-block",
+                        c.tierRequired === 'Bronze' ? "bg-orange-100 text-orange-700" :
+                        c.tierRequired === 'Silver' ? "bg-blue-100 text-blue-700" :
+                        "bg-pink-100 text-pink-700"
+                      )}>
+                        {c.label} {unlocked ? "" : "🔒"}
+                      </span>
+                    </div>
+                    {isSelected && (
+                      <div className="absolute top-2 right-2 w-4 h-4 bg-emerald-500 rounded-full flex items-center justify-center shadow-sm">
+                        <div className="w-1.5 h-1.5 bg-white rounded-full"></div>
+                      </div>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </motion.div>
+        </div>
+      )}
 
       <RewardsModal
         isOpen={showRewardsModal}

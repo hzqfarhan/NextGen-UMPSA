@@ -10,6 +10,7 @@ interface PetProps {
   animation?: PetAnimation
   size?: number
   className?: string
+  companionId?: string
 }
 
 const ANIMATIONS: Record<PetAnimation, { row: number; frames: number }> = {
@@ -28,8 +29,8 @@ const ANIMATIONS: Record<PetAnimation, { row: number; frames: number }> = {
 const ROWS = 10
 const COLS = 8
 
-export function Pet({ animation = "idle", size = 64, className }: PetProps) {
-  const { petOffsets } = useStore()
+export function Pet({ animation = "idle", size = 64, className, companionId }: PetProps) {
+  const { petOffsets, selectedCompanion } = useStore()
   const [frame, setFrame] = useState(0)
   const anim = ANIMATIONS[animation]
   const currentOffset = petOffsets[animation] || { offsetY: 0, scale: 800 }
@@ -60,7 +61,7 @@ export function Pet({ animation = "idle", size = 64, className }: PetProps) {
       <div
         className="absolute w-full h-full"
         style={{
-          backgroundImage: `url('${process.env.NEXT_PUBLIC_BASE_PATH || ""}/assets/nextgen-companion/spritesheet.webp')`,
+          backgroundImage: `url('${process.env.NEXT_PUBLIC_BASE_PATH || ""}/assets/nextgen-companion/${companionId || selectedCompanion || 'uteh'}.webp')`,
           backgroundSize: `${currentOffset.scale}% auto`,
           backgroundPosition: `${xOffset}px ${yOffset}px`,
         }}

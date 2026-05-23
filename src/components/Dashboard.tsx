@@ -40,7 +40,9 @@ export function Dashboard() {
     highestStreak,
     membershipTier,
     streakShieldActive,
-    simulateNextDay
+    moveFundsToAwfarNest,
+    simulateNextDay,
+    simulateNextTier
   } = useStore()
   const bills = useStore(state => state.bills)
 
@@ -367,22 +369,26 @@ export function Dashboard() {
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
                 {currentStreak === 0 ? (
-                  <Flame className="w-12 h-12 text-slate-300 shrink-0" />
+                  <button onClick={() => simulateNextTier()} className="outline-none hover:scale-110 active:scale-95 transition-transform duration-300 cursor-pointer">
+                    <Flame className="w-12 h-12 text-slate-300 shrink-0" />
+                  </button>
                 ) : (
-                  <img
-                    src="/assets/API-streak.gif"
-                    alt="Streak Icon"
-                    className="w-12 h-12 object-contain transition-all duration-500"
-                    style={{
-                      filter: todaySavings < 1.0
-                        ? "grayscale(1) opacity(0.4)"
-                        : currentStreak < 7
-                          ? "hue-rotate(15deg) saturate(2.5) drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))"
-                          : currentStreak < 30
-                            ? "hue-rotate(200deg) saturate(2.2) drop-shadow(0 0 8px rgba(37, 99, 235, 0.6))"
-                            : "hue-rotate(280deg) saturate(2.5) brightness(1.1) drop-shadow(0 0 12px rgba(168, 85, 247, 0.7))"
-                    }}
-                  />
+                  <button onClick={() => simulateNextTier()} className="outline-none hover:scale-110 active:scale-95 transition-transform duration-300 cursor-pointer">
+                    <img
+                      src="/assets/API-streak.gif"
+                      alt="Streak Icon"
+                      className="w-12 h-12 object-contain transition-all duration-500"
+                      style={{
+                        filter: todaySavings < 1.0
+                          ? "grayscale(1) opacity(0.4)"
+                          : currentStreak < 7
+                            ? "hue-rotate(15deg) saturate(2.5) drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))"
+                            : currentStreak < 30
+                              ? "hue-rotate(200deg) saturate(2.2) drop-shadow(0 0 8px rgba(37, 99, 235, 0.6))"
+                              : "hue-rotate(280deg) saturate(2.5) brightness(1.1) drop-shadow(0 0 12px rgba(168, 85, 247, 0.7))"
+                      }}
+                    />
+                  </button>
                 )}
                 <div>
                   <div className="flex items-center gap-2">
@@ -420,12 +426,12 @@ export function Dashboard() {
                   <Send className="w-4 h-4" />
                 </motion.button>
 
-                {/* 1:1 Circle Simulate Next Day button */}
+                {/* 1:1 Circle Simulate Next Tier button */}
                 <motion.button
                   whileTap={{ scale: 0.95 }}
-                  onClick={() => simulateNextDay()}
+                  onClick={() => simulateNextTier()}
                   className="w-9 h-9 shrink-0 rounded-full bg-[#221F20] text-white flex items-center justify-center hover:bg-[#221F20]/90 transition-colors shadow-sm"
-                  title={language === 'en' ? 'Simulate Next Day' : 'Simulasi Hari Seterusnya'}
+                  title={language === 'en' ? 'Simulate Next Tier' : 'Simulasi Tahap Seterusnya'}
                 >
                   <CalendarClock className="w-4 h-4" />
                 </motion.button>
