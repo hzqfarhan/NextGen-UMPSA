@@ -72,10 +72,11 @@ export function Dashboard() {
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,
         width: 360,
-        height: 640,
+        height: 450,
         style: {
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
+          width: '360px',
+          height: '450px',
+          transform: 'none',
           margin: '0',
           padding: '0',
           boxShadow: 'none',
@@ -118,10 +119,11 @@ export function Dashboard() {
       const dataUrl = await toPng(shareCardRef.current, {
         pixelRatio: 2,
         width: 360,
-        height: 640,
+        height: 450,
         style: {
-          transform: 'scale(1)',
-          transformOrigin: 'top left',
+          width: '360px',
+          height: '450px',
+          transform: 'none',
           margin: '0',
           padding: '0',
           boxShadow: 'none',
@@ -580,7 +582,7 @@ export function Dashboard() {
                 </div>
 
                 {/* Card Container with responsive scaling */}
-                <div className="scale-[0.65] sm:scale-75 origin-center my-[-90px] shadow-lg rounded-[2.5rem]">
+                <div className="scale-[0.8] sm:scale-90 origin-center my-2 shadow-lg rounded-[2.5rem]">
                   <StreakShareCard
                     currentStreak={currentStreak}
                     highestStreak={highestStreak}
