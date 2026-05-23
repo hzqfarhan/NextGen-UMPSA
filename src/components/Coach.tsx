@@ -548,7 +548,7 @@ export function Coach() {
 
     const triggerSave = textToSubmit.includes("save") || textToSubmit.includes("goal") || textToSubmit.includes("fund") || textToSubmit.includes("laptop") || textToSubmit.includes("emergency") || isListingPockets || isAddFundsTriggered
     const triggerDebt = textToSubmit.includes("debt") || textToSubmit.includes("bnpl") || textToSubmit.includes("loan") || textToSubmit.includes("risk") || textToSubmit.includes("credit") || textToSubmit.includes("afford") || textToSubmit.includes("buy")
-    const triggerBills = textToSubmit.includes("bill") || textToSubmit.includes("rent") || textToSubmit.includes("autopay") || textToSubmit.includes("commitment") || textToSubmit.includes("lock") || textToSubmit.includes("protected")
+    const triggerBills = textToSubmit.includes("bill") || /\brent\b/.test(textToSubmit) || textToSubmit.includes("autopay") || textToSubmit.includes("commitment") || /\block\b/.test(textToSubmit) || textToSubmit.includes("protected")
     const triggerTransfer = textToSubmit.includes("money move") || textToSubmit.includes("transfer") || textToSubmit.includes("send") || (textToSubmit.includes("pay") && textToSubmit.includes("to"))
 
     // Reset & Replace: If a new request comes in, clean out any unsubmitted tasks of the same type

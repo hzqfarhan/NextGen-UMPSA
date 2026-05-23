@@ -811,7 +811,7 @@ const useStoreBase = create<NextGenState>()(
           nextPockets.push(nest);
         } else {
           nextPockets = state.savingsPockets.map(p => 
-            p.id === nest.id ? { ...p, current: p.current + amount } : p
+            p.id === nest!.id ? { ...p, current: p.current + amount } : p
           );
         }
 

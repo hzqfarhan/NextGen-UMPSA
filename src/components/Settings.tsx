@@ -239,6 +239,24 @@ export function Settings() {
         </section>
 
         <section className="space-y-2">
+          <h3 className="text-[10px] uppercase font-bold text-muted-foreground px-2 tracking-widest">System Diagnostics</h3>
+          <Card className="glass-card">
+            <CardContent className="p-4 flex items-center justify-between">
+              <div>
+                <h4 className="text-xs font-bold text-slate-800">Connection Diagnostics</h4>
+                <p className="text-[10px] text-muted-foreground mt-0.5">Test database connection and Gemini API integrations.</p>
+              </div>
+              <button
+                onClick={() => router.push("/diagnostics")}
+                className="px-3 py-1.5 bg-pink-50 border border-pink-200 text-[10px] font-bold text-pink-600 rounded-xl hover:bg-pink-100 transition-colors uppercase tracking-wider flex items-center gap-1 active:scale-95"
+              >
+                🔍 Troubleshoot
+              </button>
+            </CardContent>
+          </Card>
+        </section>
+
+        <section className="space-y-2">
           <h3 className="text-[10px] uppercase font-bold text-muted-foreground px-2 tracking-widest">{strings.settingsAccount}</h3>
           <Card className="glass-card">
             <CardContent className="p-0">
