@@ -55,7 +55,7 @@ export function Transfer() {
   
   const prediction = validAmount && !hasInsufficientBalance
     ? numAmount > safeDailySpend * 3
-      ? `Sending RM ${numAmount.toFixed(2)} will move your Broke Date 4 days earlier. Consider splitting this into smaller Money Moves.`
+      ? `Sending RM ${numAmount.toFixed(2)} will move your Broke Date 4 days earlier. Consider splitting this into smaller transfers.`
       : numAmount > safeDailySpend
         ? `This exceeds your safe daily limit of RM ${safeDailySpend.toFixed(2)}. Proceed with caution.`
         : null
@@ -79,7 +79,7 @@ export function Transfer() {
         title: `${finalRecipient.name} (${finalRecipient.bank})`,
         amount: finalAmount,
         date: new Date().toISOString(),
-        category: "Money Move",
+        category: "Transfer",
         type: 'expense',
         confidence: 0.95
       })
@@ -97,7 +97,7 @@ export function Transfer() {
     
     setTimeout(() => {
       const lowerCmd = cmd.toLowerCase()
-      // Rule-based parsing: "Send [amount] to [name]" or "Money Move to [name]"
+      // Rule-based parsing: "Send [amount] to [name]" or "Transfer to [name]"
       const amountMatch = lowerCmd.match(/(\d+(\.\d+)?)/)
       const targetAmount = amountMatch ? parseFloat(amountMatch[0]) : 50 // default to 50 if not specified
       
@@ -107,7 +107,7 @@ export function Transfer() {
         setProposal({
           recipientId: recipient.id,
           amount: targetAmount,
-          message: `I've prepared a Money Move of RM ${targetAmount.toFixed(2)} to ${recipient.name}. Shall I execute it?`
+          message: `I've prepared a transfer of RM ${targetAmount.toFixed(2)} to ${recipient.name}. Shall I execute it?`
         })
         setAiStatus("suggesting")
       } else {
@@ -151,7 +151,7 @@ export function Transfer() {
               </div>
               
               <div className="space-y-2">
-                <h2 className="text-xl font-black text-foreground">Money Move Successful</h2>
+                <h2 className="text-xl font-black text-foreground">Transfer Successful</h2>
                 <p className="text-xs text-muted-foreground leading-relaxed px-4">
                   Successfully sent <span className="text-primary font-bold">RM {parseFloat(amount).toFixed(2)}</span> to {selectedRecipient.name}
                 </p>
@@ -182,7 +182,7 @@ export function Transfer() {
                 <ArrowLeft className="w-5 h-5" />
               </Button>
             </Link>
-            <h1 className="text-lg font-bold text-foreground">Money Move</h1>
+            <h1 className="text-lg font-bold text-foreground">Transfer</h1>
           </div>
           {/* Balance Pill */}
           <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-foreground/5 border border-border">
@@ -333,7 +333,7 @@ export function Transfer() {
                 className="overflow-hidden"
               >
                 <div className="flex items-center justify-between px-1 py-1">
-                  <span className="text-[10px] text-muted-foreground">Remaining after Money Move</span>
+                  <span className="text-[10px] text-muted-foreground">Remaining after transfer</span>
                   <span className={cn(
                     "text-[11px] font-bold",
                     remainingBalance < safeDailySpend ? "text-amber-500" : "text-emerald-500"
@@ -360,10 +360,10 @@ export function Transfer() {
                 <div className="space-y-1">
                   <p className="text-xs font-bold text-rose-500">🚨 Survival Threshold Blocked</p>
                   <p className="text-[11px] text-rose-500/70 leading-relaxed">
-                    This Money Move would drop your daily safe spending limit to <span className="font-bold text-rose-400">RM {safeDailyAfter.toFixed(2)}/day</span>, which is below the minimum survival limit of <span className="font-bold">RM 10.00/day</span>.
+                    This transfer would drop your daily safe spending limit to <span className="font-bold text-rose-400">RM {safeDailyAfter.toFixed(2)}/day</span>, which is below the minimum survival limit of <span className="font-bold">RM 10.00/day</span>.
                   </p>
                   <p className="text-[11px] font-semibold text-rose-400">
-                    Transaction restricted: Please lower the Money Move amount to ensure you have enough daily funds to survive!
+                    Transaction restricted: Please lower the transfer amount to ensure you have enough daily funds to survive!
                   </p>
                 </div>
               </div>
@@ -442,7 +442,7 @@ export function Transfer() {
                     <BrainCircuit className="w-6 h-6" />
                   </div>
                   <div>
-                    <h2 className="text-lg font-bold">Magic Money Move</h2>
+                    <h2 className="text-lg font-bold">Magic Transfer</h2>
                     <p className="text-xs text-muted-foreground">Ask me to send money to anyone</p>
                   </div>
                 </div>
@@ -456,7 +456,7 @@ export function Transfer() {
                   <div className="w-full space-y-4">
                     <p className="text-[10px] font-black text-muted-foreground uppercase tracking-widest text-center">Try saying</p>
                     <div className="grid grid-cols-1 gap-2">
-                      {["Send 50 to Aizat", "Money Move to Danial", "Pay Ahmad Ali RM 100"].map(hint => (
+                      {["Send 50 to Aizat", "Transfer to Danial", "Pay Ahmad Ali RM 100"].map(hint => (
                         <button 
                           key={hint}
                           onClick={() => handleAICommand(hint)}
@@ -510,7 +510,7 @@ export function Transfer() {
                             </div>
                             <div className="space-y-1.5">
                               <div className="flex justify-between items-center text-[9px]">
-                                <span className="text-primary font-bold">Money Move Amount</span>
+                                <span className="text-primary font-bold">Transfer Amount</span>
                                 <span className="font-bold text-white">RM {proposal.amount.toFixed(2)}</span>
                               </div>
                               <div className="h-1 w-full bg-primary/10 rounded-full overflow-hidden">
@@ -519,7 +519,7 @@ export function Transfer() {
                             </div>
                             <div className="flex justify-between items-center pt-2 border-t border-white/5">
                               <span className="text-[8px] text-emerald-400 font-bold flex items-center gap-1">
-                                <Send className="w-2 h-2" /> Direct Bank Money Move
+                                <Send className="w-2 h-2" /> Direct Bank Transfer
                               </span>
                               <span className="text-[8px] text-primary font-bold uppercase tracking-wider">Proposal Preview</span>
                             </div>
@@ -600,7 +600,7 @@ export function Transfer() {
                 <Send className="w-4 h-4 ml-1" />
               </>
             ) : (
-              "Enter amount to Money Move"
+              "Enter amount to Transfer"
             )}
           </Button>
         </div>

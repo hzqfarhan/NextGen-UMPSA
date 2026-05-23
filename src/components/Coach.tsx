@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe, Flame, Sparkles, Gift, X } from "lucide-react"
+import { Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe, Flame, Sparkles, Gift, X, Mic, MicOff } from "lucide-react"
 import { RewardsModal } from "./RewardsModal"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
@@ -74,6 +74,94 @@ export function Coach() {
   const [isAtBottom, setIsAtBottom] = useState(true)
   const [showRewardsModal, setShowRewardsModal] = useState(false)
   const [showCompanionModal, setShowCompanionModal] = useState(false)
+
+  // Speech Recognition states & ref
+  const [isListening, setIsListening] = useState(false)
+  const [interimTranscript, setInterimTranscript] = useState("")
+  const recognitionRef = useRef<any>(null)
+  const transcriptRef = useRef("")
+
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (SpeechRecognition) {
+        const rec = new SpeechRecognition();
+        rec.continuous = true;
+        rec.interimResults = true;
+        rec.lang = 'en-US';
+
+        rec.onstart = () => {
+          setIsListening(true);
+          setInterimTranscript("");
+          transcriptRef.current = "";
+        };
+
+        rec.onend = () => {
+          setIsListening(false);
+          const finalPrompt = transcriptRef.current.trim();
+          if (finalPrompt) {
+            sendMessage(finalPrompt);
+            transcriptRef.current = "";
+          }
+        };
+
+        rec.onerror = (event: any) => {
+          console.error('Speech recognition error:', event.error);
+          setIsListening(false);
+          if (event.error === 'not-allowed') {
+            alert('Microphone access blocked! Since you are accessing the app over HTTP, please either use HTTPS or enable "Insecure origins treated as secure" in chrome://flags.');
+          } else if (event.error === 'network') {
+            alert('Speech recognition network error! Chrome requires a secure context (HTTPS/localhost) and active internet connection to communicate with Google Speech APIs.');
+          }
+        };
+
+        rec.onresult = (event: any) => {
+          let interim = "";
+          let final = "";
+
+          for (let i = event.resultIndex; i < event.results.length; ++i) {
+            const transcriptText = event.results[i][0].transcript;
+            if (event.results[i].isFinal) {
+              final += transcriptText;
+            } else {
+              interim += transcriptText;
+            }
+          }
+
+          if (final) {
+            setInput(prev => {
+              const base = prev.trim();
+              const updated = base ? `${base} ${final}` : final;
+              transcriptRef.current = updated;
+              return updated;
+            });
+            setInterimTranscript("");
+          } else if (interim) {
+            setInterimTranscript(interim);
+          }
+        };
+
+        recognitionRef.current = rec;
+      }
+    }
+  }, []);
+
+  const toggleListening = () => {
+    if (!recognitionRef.current) {
+      alert('Speech recognition is not supported in this browser. Please use Chrome or Safari.');
+      return;
+    }
+
+    if (isListening) {
+      recognitionRef.current.stop();
+    } else {
+      try {
+        recognitionRef.current.start();
+      } catch (err) {
+        console.error('Failed to start speech recognition:', err);
+      }
+    }
+  };
 
   // Affordability state
   const [affordItem, setAffordItem] = useState("")
@@ -370,19 +458,19 @@ export function Coach() {
           const nextSafeDaily = oldState.calculateDailyLimitForBalance(oldState.user.currentBalance - parsedAmount);
 
           if (nextSafeDaily < 10.0) {
-            throw new Error(`Money Move blocked. Sending RM ${parsedAmount.toFixed(2)} would reduce your safe daily spending to RM ${nextSafeDaily.toFixed(2)}/day, which is below the RM 10.00 survival limit.`);
+            throw new Error(`Transfer blocked. Sending RM ${parsedAmount.toFixed(2)} would reduce your safe daily spending to RM ${nextSafeDaily.toFixed(2)}/day, which is below the RM 10.00 survival limit.`);
           }
 
           addTransaction({
             id: `txn-${Date.now()}`,
-            title: `Money Move to ${action.payload.recipient}`,
+            title: `Transfer to ${action.payload.recipient}`,
             amount: parsedAmount,
-            category: 'Money Move',
+            category: 'Transfer',
             date: new Date().toISOString(),
             type: 'expense',
             confidence: 1.0
           });
-          responseText = `Money Move complete. RM ${parsedAmount.toFixed(2)} has been successfully sent to ${action.payload.recipient}. The transaction is now logged in your history.`;
+          responseText = `Transfer complete. RM ${parsedAmount.toFixed(2)} has been successfully sent to ${action.payload.recipient}. The transaction is now logged in your history.`;
           redirect = { label: "View Transactions", href: "/transactions" };
           useStore.setState({ pet: { ...useStore.getState().pet, animation: "excited" } });
         } catch (error: any) {
@@ -605,9 +693,9 @@ export function Coach() {
         responses.push({
           role: 'assistant',
           agent: 'Finance Strategist',
-          content: "I can help with that. I've prepared a Money Move proposal based on your recent activity. Review the details below:",
+          content: "I can help with that. I've prepared a transfer proposal based on your recent activity. Review the details below:",
           proposal: {
-            name: 'Money Move to Aizat',
+            name: 'Transfer to Aizat',
             type: 'transfer',
             amount: 50,
             recipient: 'Aizat',
@@ -616,13 +704,13 @@ export function Coach() {
           },
           actions: [
             {
-              id: 'approve_Money Move',
+              id: 'approve_transfer',
               label: 'Approve & Send',
               type: 'transfer',
               payload: { amount: 50, recipient: 'Aizat' }
             },
             {
-              id: 'postpone_Money Move',
+              id: 'postpone_transfer',
               label: 'Decline',
               type: 'postpone'
             }
@@ -1619,7 +1707,7 @@ export function Coach() {
                                       </div>
                                       <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                          <p className="text-xs font-bold text-[#221F20]">{m.proposal.name || (m.proposal.type === 'transfer' ? 'Money Move' : 'Pocket')}</p>
+                                          <p className="text-xs font-bold text-[#221F20]">{m.proposal.name || (m.proposal.type === 'transfer' ? 'Transfer' : 'Pocket')}</p>
                                           <Badge className="text-[7px] h-3 bg-primary/20 text-primary border-primary/20 px-1 font-black">
                                             {m.proposal.type === 'transfer' ? 'Verified' : 'Managed'}
                                           </Badge>
@@ -1748,13 +1836,27 @@ export function Coach() {
 
         <div className="relative group">
           <Input
-            placeholder={isThinking || isExecuting ? "Wait for the council..." : strings.coachInputPlaceholder}
+            placeholder={isThinking || isExecuting ? "Wait for the council..." : (isListening ? "Listening... Speak now!" : strings.coachInputPlaceholder)}
             disabled={isThinking || isExecuting}
-            className="pr-12 bg-white border-pink-100 h-12 rounded-2xl text-xs text-[#221F20] placeholder:text-[#727272] shadow-sm shadow-pink-100/60 focus:border-primary focus:ring-primary/20 disabled:bg-[#F8F8F8]"
+            className="pr-24 bg-white border-pink-100 h-12 rounded-2xl text-xs text-[#221F20] placeholder:text-[#727272] shadow-sm shadow-pink-100/60 focus:border-primary focus:ring-primary/20 disabled:bg-[#F8F8F8]"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}
           />
+          <Button
+            size="icon"
+            type="button"
+            onClick={toggleListening}
+            disabled={isThinking || isExecuting}
+            className={cn(
+              "absolute right-12 top-1 w-10 h-10 rounded-xl transition-all active:scale-95 border",
+              isListening 
+                ? "bg-red-500 hover:bg-red-600 text-white animate-pulse border-red-600" 
+                : "bg-slate-50 hover:bg-slate-100 text-slate-500 border-pink-50/50"
+            )}
+          >
+            {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+          </Button>
           <Button
             size="icon"
             disabled={isThinking || isExecuting || !input.trim()}
@@ -1829,6 +1931,80 @@ export function Coach() {
         isOpen={showRewardsModal}
         onClose={() => setShowRewardsModal(false)}
       />
+
+      {/* Voice Chat Overlay Screen (Aura AI style) */}
+      <AnimatePresence>
+        {isListening && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-zinc-950/95 backdrop-blur-2xl z-[99] flex flex-col justify-between p-6 text-center select-none"
+          >
+            {/* Custom slow-spin styles */}
+            <style>{`
+              @keyframes spin-slow {
+                0% { transform: rotate(0deg); }
+                100% { transform: rotate(360deg); }
+              }
+              .animate-spin-slow {
+                animation: spin-slow 15s linear infinite;
+              }
+            `}</style>
+
+            {/* Top header */}
+            <div className="flex justify-between items-center w-full mt-4">
+              <span className="text-xs font-mono text-purple-400 uppercase tracking-widest font-bold">Voice Assistant Mode</span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
+                Recording
+              </span>
+            </div>
+
+            {/* Main content area */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-8 px-4">
+              {/* Glowing animated orb (Aura style) */}
+              <div className="relative w-48 h-48 flex items-center justify-center">
+                {/* Outer pulsing glow */}
+                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 opacity-25 blur-3xl animate-pulse scale-125"></div>
+                {/* Medium glowing spinning orb */}
+                <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-purple-500 via-indigo-600 to-cyan-400 opacity-60 blur-md animate-spin-slow"></div>
+                {/* Core glass-looking orb */}
+                <div className="absolute inset-4 rounded-full bg-gradient-to-br from-white/10 to-black border border-white/10 shadow-2xl backdrop-blur-2xl flex items-center justify-center">
+                  <Mic className="w-10 h-10 text-white animate-pulse" />
+                </div>
+              </div>
+
+              {/* Status and transcription */}
+              <div className="space-y-4 max-w-sm w-full">
+                <p className="text-xs text-purple-300/80 font-bold uppercase tracking-widest">Listening...</p>
+                <div className="min-h-16 flex items-center justify-center">
+                  <p className="text-lg font-medium leading-relaxed bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent break-words transition-all duration-300">
+                    {interimTranscript || (input ? input : "Start speaking your financial query...")}
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            {/* Bottom actions */}
+            <div className="mb-8 flex flex-col items-center gap-4">
+              <button
+                type="button"
+                onClick={() => {
+                  if (recognitionRef.current) {
+                    recognitionRef.current.stop();
+                  }
+                  setIsListening(false);
+                }}
+                className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all border border-white/20 z-50 cursor-pointer"
+              >
+                <MicOff className="w-6 h-6" />
+              </button>
+              <p className="text-[10px] text-slate-500 uppercase tracking-widest">Tap to stop & send</p>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
