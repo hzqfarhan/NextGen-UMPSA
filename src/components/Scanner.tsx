@@ -262,9 +262,9 @@ export function Scanner() {
             <motion.div 
               initial={{ opacity: 0, y: 50, scale: 0.95 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
-              className="w-full"
+              className="w-full max-h-[75vh] overflow-y-auto scrollbar-hide rounded-3xl shadow-2xl"
             >
-              <Card className="bg-white border-none shadow-2xl rounded-3xl overflow-hidden">
+              <Card className="bg-white border-none rounded-3xl overflow-hidden">
                 <div className={cn(alertStyles.bg, "p-4 flex gap-3", alertStyles.border)}>
                   <div className={cn("w-10 h-10 rounded-full flex items-center justify-center shrink-0", alertStyles.iconBg, alertStyles.text)}>
                     <Zap className="w-5 h-5" />

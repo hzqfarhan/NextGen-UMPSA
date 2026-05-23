@@ -204,7 +204,7 @@ interface NextGenState {
   pendingMainGoal: string | null;
   hasNotificationSave: boolean;
   lastQuotaUpdateDate: string | null;
-  
+
   // Gamification & BIMB Transition State
   currentStreak: number;
   highestStreak: number;
@@ -214,7 +214,6 @@ interface NextGenState {
   awfarDrawTickets: number;
   isBimbMigrated: boolean;
   selectedCompanion: string;
-  
   // Actions
   setShowSpendOnly: (val: boolean) => void;
   setHideBalance: (val: boolean) => void;
@@ -236,7 +235,6 @@ interface NextGenState {
   updateNextGenScore: () => void;
   setLanguage: (lang: Language) => void;
   setSelectedCompanion: (c: string) => void;
-  
   // Gamification Actions
   incrementStreak: () => void;
   resetStreak: () => void;
@@ -245,7 +243,6 @@ interface NextGenState {
   moveFundsToAwfarNest: (amount: number) => void;
   simulateNextDay: () => void;
   simulateNextTier: () => void;
-  
   // Bills Actions
   addBill: (b: Bill) => void;
   updateBill: (id: string, updates: Partial<Bill>) => void;
@@ -267,23 +264,46 @@ const RISK_RETURNS = {
 };
 
 function getDaysRemaining(state: any) {
+  const today = new Date();
+  today.setDate(today.getDate() + (state.simulatedDayOffset || 0));
+
   if (state.user.incomeSource === "fixed" && state.user.fixedFrequency === "weekly" && state.user.weeklyPayDay) {
     const daysMap: Record<string, number> = {
       sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
     };
     const targetIndex = daysMap[state.user.weeklyPayDay.toLowerCase()] ?? 5;
-    const today = new Date();
     const todayIndex = today.getDay();
     let diff = targetIndex - todayIndex;
     if (diff <= 0) diff += 7;
     return diff;
   }
+
+  if (state.user.incomeSource === "irregular" || state.user.incomeSource === "lump-sum") {
+    const startStr = state.user.lumpStartDate || state.user.setupDate;
+    if (!startStr) return state.user.durationDays || 30;
+    
+    let start = new Date(startStr);
+    const duration = state.user.durationDays || 30;
+    let end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
+    
+    while (end.getTime() <= today.getTime()) {
+      start = new Date(end);
+      end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
+    }
+    
+    const diffTime = end.getTime() - today.getTime();
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+  }
+
   if (!state.user.nextAllowanceDate) return 14;
-  const today = new Date();
-  const nextDate = new Date(state.user.nextAllowanceDate);
+  let nextDate = new Date(state.user.nextAllowanceDate);
+  
+  while (nextDate.getTime() <= today.getTime()) {
+    nextDate.setMonth(nextDate.getMonth() + 1);
+  }
+
   const diffTime = nextDate.getTime() - today.getTime();
-  const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-  return diffDays > 0 ? diffDays : 30;
+  return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
 }
 
 function calculateDailyLimit(state: any, updatedBalance: number, daysLeft: number) {
@@ -297,14 +317,8 @@ function calculateDailyLimit(state: any, updatedBalance: number, daysLeft: numbe
       remainingCommitment = totalCommitments; // monthly commitment
     }
   } else {
-    const start = state.user.lumpStartDate ? new Date(state.user.lumpStartDate) : (state.user.setupDate ? new Date(state.user.setupDate) : new Date());
-    const duration = state.user.durationDays || 30;
-    const end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
-    const today = new Date();
-    const diffTime = end.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    const remainingDays = diffDays > 0 ? diffDays : duration;
-    const remainingMonths = remainingDays / 30;
+    // For lump sum, daysLeft accurately reflects the remainder of the custom duration
+    const remainingMonths = daysLeft / 30;
     remainingCommitment = totalCommitments * remainingMonths;
   }
 
@@ -426,7 +440,7 @@ const useStoreBase = create<NextGenState>()(
             initialSafeDaily: nextSafeDaily
           };
         });
-        
+
         if (!skipRoundUp && t.type === 'expense') {
           get().processRoundUp(t.amount);
         }
@@ -446,7 +460,7 @@ const useStoreBase = create<NextGenState>()(
           const cleanedPockets = p.isMainGoal
             ? state.savingsPockets.map(pocket => ({ ...pocket, isMainGoal: false }))
             : state.savingsPockets;
-          
+
           const newTransactions = [...state.transactions];
           if (p.current > 0) {
             newTransactions.unshift({
@@ -487,7 +501,7 @@ const useStoreBase = create<NextGenState>()(
         const state = get();
         const pocket = state.savingsPockets.find(p => p.id === id);
         if (!pocket) return;
-        
+
         const updatedBalance = state.user.currentBalance + pocket.current;
         const daysLeft = getDaysRemaining(state);
         const nextSafeDaily = calculateDailyLimit(state, updatedBalance, daysLeft);
@@ -553,15 +567,17 @@ const useStoreBase = create<NextGenState>()(
           let petMessage = `Nice save! Moving RM ${amount.toFixed(2)} to ${pocketName}. Your daily quota remains stable for today, and your NextGen Score is fully protected!`;
           let petAnimation = "happy";
 
+          let lastCalc = state.lastCalculatedDate;
+
           if (isFirstTimeMeetingQuota) {
             streakUpdated += 1;
             highest = Math.max(highest, streakUpdated);
+            lastCalc = todayStr;
             if (streakUpdated >= 30) tier = 'Legend';
             else if (streakUpdated >= 7) tier = 'Pro';
-            
             petMessage = `Awesome save! You've met today's savings quota of RM 1.00 and protected your streak! Your streak is now ${streakUpdated} days! 🔥`;
             petAnimation = "excited";
-            
+
             if (tier !== state.membershipTier) {
               if (tier === 'Pro') petMessage += ` You unlocked Pro Saver Tier! 🥈`;
               if (tier === 'Legend') petMessage += ` You unlocked Legend Guardian Tier! 🥇`;
@@ -577,6 +593,7 @@ const useStoreBase = create<NextGenState>()(
             currentStreak: streakUpdated,
             highestStreak: highest,
             membershipTier: tier,
+            lastCalculatedDate: lastCalc,
             pet: {
               message: petMessage,
               animation: petAnimation
@@ -593,13 +610,13 @@ const useStoreBase = create<NextGenState>()(
       checkAndRefreshDailyQuota: () => {
         const todayStr = new Date().toDateString();
         const state = get();
-        
+
         if (state.lastQuotaUpdateDate === todayStr) return;
 
         const balance = state.user.currentBalance;
         const SAVING_DEFAULT_COMMITMENT_RATE = 0.001;
         const savingDefaultCommitment = balance * SAVING_DEFAULT_COMMITMENT_RATE;
-        
+
         let nextPockets = state.savingsPockets;
         let nextBalance = balance;
         let addedSavingsTx = null;
@@ -611,7 +628,7 @@ const useStoreBase = create<NextGenState>()(
               p.isMainGoal ? { ...p, current: p.current + savingDefaultCommitment } : p
             );
             nextBalance = balance - savingDefaultCommitment;
-            
+
             addedSavingsTx = {
               id: "auto-commitment-" + Date.now(),
               title: `Default Saving (${mainPocket.name})`,
@@ -668,7 +685,7 @@ const useStoreBase = create<NextGenState>()(
           initialSafeDaily: flooredDaily > 0 ? flooredDaily : 10.0,
           safeDailySpend: flooredDaily > 0 ? flooredDaily : 10.0,
         }));
-        
+
         get().updateNextGenScore();
       },
       toggleSpendGuard: () => set((state) => ({ isSpendGuardActive: !state.isSpendGuardActive })),
@@ -707,7 +724,7 @@ const useStoreBase = create<NextGenState>()(
           lastAutoSaveDate: todayStr,
           user: { ...state.user, currentBalance: state.user.currentBalance - totalAmount },
           savingsPockets: newPockets,
-          pet: { 
+          pet: {
             message: `Nice! Saved RM ${totalAmount.toFixed(2)} automatically today.`,
             animation: "happy"
           }
@@ -715,10 +732,10 @@ const useStoreBase = create<NextGenState>()(
       }),
       processRoundUp: (amount) => set((state) => {
         if (!state.isRoundUpActive || state.autoSaveTargetIds.length === 0) return state;
-        
+
         const nextDollar = Math.ceil(amount);
         const roundUp = nextDollar - amount;
-        
+
         if (roundUp <= 0) return state;
         if (state.user.currentBalance < roundUp) return state;
 
@@ -733,7 +750,7 @@ const useStoreBase = create<NextGenState>()(
         return {
           user: { ...state.user, currentBalance: state.user.currentBalance - roundUp },
           savingsPockets: newPockets,
-          pet: { 
+          pet: {
             message: `Spare change alert! RM ${roundUp.toFixed(2)} rounded up into pockets.`,
             animation: "excited"
           }
@@ -771,6 +788,9 @@ const useStoreBase = create<NextGenState>()(
         };
       }),
       incrementStreak: () => set((state) => {
+        const todayStr = new Date().toDateString();
+        if (state.lastCalculatedDate === todayStr) return state; // Prevent double increment on same calendar day
+
         const nextStreak = state.currentStreak + 1;
         const highest = Math.max(state.highestStreak, nextStreak);
         let tier = state.membershipTier;
@@ -783,6 +803,7 @@ const useStoreBase = create<NextGenState>()(
           currentStreak: nextStreak,
           highestStreak: highest,
           membershipTier: tier,
+          lastCalculatedDate: todayStr,
           pet: {
             message: `Streak increased to ${nextStreak} days! 🔥 Keep it up!`,
             animation: "excited"
@@ -816,7 +837,7 @@ const useStoreBase = create<NextGenState>()(
         if (state.user.currentBalance < amount) {
           throw new Error("Insufficient balance in your wallet.");
         }
-        
+
         let nest = state.savingsPockets.find(p => p.name === "Be U Awfar Nest");
         let nextPockets = [...state.savingsPockets];
 
@@ -833,7 +854,7 @@ const useStoreBase = create<NextGenState>()(
           };
           nextPockets.push(nest);
         } else {
-          nextPockets = state.savingsPockets.map(p => 
+          nextPockets = state.savingsPockets.map(p =>
             p.id === nest!.id ? { ...p, current: p.current + amount } : p
           );
         }
@@ -855,11 +876,11 @@ const useStoreBase = create<NextGenState>()(
       simulateNextDay: () => {
         const state = get();
         const todayStr = new Date().toDateString();
-        
+
         const todaySavings = state.transactions
           .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
           .reduce((sum, t) => sum + t.amount, 0);
-          
+
         let streakUpdated = state.currentStreak;
         let shieldActive = state.streakShieldActive;
         let petAnimation = 'idle';
@@ -882,7 +903,6 @@ const useStoreBase = create<NextGenState>()(
         }
 
         const highest = Math.max(state.highestStreak, streakUpdated);
-        
         let tier: 'Novice' | 'Pro' | 'Legend' = 'Novice';
         if (streakUpdated >= 30) {
           tier = 'Legend';
@@ -992,8 +1012,8 @@ const useStoreBase = create<NextGenState>()(
             .reduce((sum, t) => sum + t.amount, 0);
 
           const safeQuota = state.initialSafeDaily || 15.0;
-          const cashflowScore = todayExpenses <= safeQuota 
-            ? 100 
+          const cashflowScore = todayExpenses <= safeQuota
+            ? 100
             : Math.max(0, 100 - ((todayExpenses - safeQuota) / safeQuota) * 100);
 
           // 2. Savings Progress (20% Weight)
@@ -1007,13 +1027,13 @@ const useStoreBase = create<NextGenState>()(
           // Note: total balance includes both current wallet balance and current Savings Hub to protect score when saving!
           const commitments = state.user.totalCommitments || 0;
           const totalBalance = (state.user.currentBalance || 800) + currentSaved;
-          const debtScore = totalBalance > 0 
-            ? Math.max(0, Math.min(100, (1 - (commitments / totalBalance)) * 100)) 
+          const debtScore = totalBalance > 0
+            ? Math.max(0, Math.min(100, (1 - (commitments / totalBalance)) * 100))
             : 100;
 
           // Total NextGen Score weighted calculation
           const finalScore = Math.round((0.5 * cashflowScore) + (0.3 * debtScore) + (0.2 * savingsScore));
-          
+
           return {
             nextGenScore: finalScore,
             nextGenCashflowScore: Math.round(cashflowScore),
@@ -1029,7 +1049,7 @@ const useStoreBase = create<NextGenState>()(
         set((state) => {
           const nextBills = [...state.bills, b];
           const totalCommitments = nextBills.reduce((sum, bill) => sum + bill.amount, 0);
-          return { 
+          return {
             bills: nextBills,
             user: { ...state.user, totalCommitments }
           };
@@ -1040,7 +1060,7 @@ const useStoreBase = create<NextGenState>()(
         set((state) => {
           const nextBills = state.bills.map(b => b.id === id ? { ...b, ...updates, updatedAt: new Date().toISOString() } : b);
           const totalCommitments = nextBills.reduce((sum, bill) => sum + bill.amount, 0);
-          return { 
+          return {
             bills: nextBills,
             user: { ...state.user, totalCommitments }
           };
@@ -1051,7 +1071,7 @@ const useStoreBase = create<NextGenState>()(
         set((state) => {
           const nextBills = state.bills.filter(b => b.id !== id);
           const totalCommitments = nextBills.reduce((sum, bill) => sum + bill.amount, 0);
-          return { 
+          return {
             bills: nextBills,
             user: { ...state.user, totalCommitments }
           };
@@ -1103,7 +1123,7 @@ const useStoreBase = create<NextGenState>()(
             nextDueDate: calculateNextDueDate(b.nextDueDate, b.frequency),
             paymentHistory: [paymentRecord, ...(b.paymentHistory || [])]
           } : b),
-          pet: { 
+          pet: {
             message: `Bill for ${bill.name} paid! Great job.`,
             animation: "happy"
           }
@@ -1114,7 +1134,7 @@ const useStoreBase = create<NextGenState>()(
         const today = new Date();
         const nextAllowance = new Date(state.user.nextAllowanceDate);
         const daysUntilNextAllowance = Math.max(1, Math.ceil((nextAllowance.getTime() - today.getTime()) / (1000 * 60 * 60 * 24)));
-        
+
         // Calculate current locked amount for spendable balance logic
         const lockedAmount = state.bills
           .filter(b => b.isLocked && b.status !== 'paid')
@@ -1130,7 +1150,7 @@ const useStoreBase = create<NextGenState>()(
             }
 
             const safety = isAutoPaySafe(bill, state.user.currentBalance, spendableBalance, daysUntilNextAllowance);
-            
+
             if (safety.safe) {
               const transactionId = Math.random().toString(36).substring(7);
               const paymentRecord: BillPaymentRecord = {
@@ -1160,18 +1180,18 @@ const useStoreBase = create<NextGenState>()(
                   nextDueDate: calculateNextDueDate(b.nextDueDate, b.frequency),
                   paymentHistory: [paymentRecord, ...(b.paymentHistory || [])]
                 } : b),
-                pet: { 
+                pet: {
                   message: `AutoPay: ${bill.name} RM${bill.amount} paid successfully!`,
                   animation: "excited"
                 }
               }));
             } else {
               state.updateBill(bill.id, { status: 'paused' });
-              set({ 
-                pet: { 
+              set({
+                pet: {
                   message: `AutoPay paused for ${bill.name}: ${safety.reason}`,
                   animation: "sad"
-                } 
+                }
               });
             }
           }

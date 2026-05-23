@@ -37,7 +37,17 @@ const marketData = [
 ]
 
 export function Insights() {
-  const { nextGenScore, language, savingsPockets } = useStore()
+  const { 
+    nextGenScore, 
+    language, 
+    debtRiskScore, 
+    savingsPockets, 
+    currentStreak, 
+    highestStreak, 
+    membershipTier, 
+    transactions, 
+    user 
+  } = useStore()
   const bills = useStore(state => state.bills)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -68,14 +78,25 @@ export function Insights() {
 
   // 3. Dynamic NextGen Trend Graph tracking Today's Score
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
-  const todayName = dayNames[new Date().getDay()]
+  const simulatedDayOffset = useStore(state => state.simulatedDayOffset) || 0;
+  const today = new Date();
+  today.setDate(today.getDate() + simulatedDayOffset);
+  const todayName = dayNames[today.getDay()]
 
-  const dynamicSpendingData = spendingData.map(item => {
+  let dynamicSpendingData = spendingData.map(item => {
     if (item.name === todayName) {
       return { ...item, amount: nextGenScore }
     }
     return item
   })
+
+  const todayIndex = dynamicSpendingData.findIndex(d => d.name === todayName);
+  if (todayIndex !== -1 && todayIndex !== dynamicSpendingData.length - 1) {
+    dynamicSpendingData = [
+      ...dynamicSpendingData.slice(todayIndex + 1),
+      ...dynamicSpendingData.slice(0, todayIndex + 1)
+    ];
+  }
 
   const lockedAmount = bills
     .filter(b => b.isLocked && b.status !== 'paid')
@@ -85,6 +106,31 @@ export function Insights() {
     .sort((a, b) => new Date(a.nextDueDate).getTime() - new Date(b.nextDueDate).getTime())[0];
 
   const strings = t[language]
+
+  // Dynamic Category Breakdown
+  const expenses = transactions.filter(t => t.type === 'expense')
+  const categoryTotals = expenses.reduce((acc, t) => {
+    acc[t.category] = (acc[t.category] || 0) + t.amount;
+    return acc;
+  }, {} as Record<string, number>);
+
+  const colorPalette = ['#6366f1', '#818cf8', '#fbbf24', '#f87171', '#34d399', '#f472b6'];
+  const dynamicCategoryData = Object.entries(categoryTotals)
+    .map(([name, value], i) => ({
+      name,
+      value: Math.round(value * 100) / 100,
+      color: colorPalette[i % colorPalette.length]
+    }))
+    .sort((a, b) => b.value - a.value);
+
+  const displayCategoryData = dynamicCategoryData;
+
+  // Dynamic Projected Balance
+  const upcomingBillsTotal = bills
+    .filter(b => b.status !== 'paid')
+    .reduce((sum, b) => sum + b.amount, 0);
+  const projectedBalance = Math.max(0, user.currentBalance - upcomingBillsTotal);
+  const projectedSavings = savingsPockets.reduce((sum, p) => sum + p.current, 0);
 
   return (
     <div className="p-4 space-y-6 pb-24 max-w-lg mx-auto">
@@ -290,12 +336,15 @@ export function Insights() {
                 <Calendar className="w-5 h-5" />
               </div>
               <div className="flex-1 space-y-0.5">
-                <p className="text-xs font-black text-[#221F20]">{strings.reportMileDebt}</p>
-                <p className="text-[9.5px] text-[#727272] font-medium leading-tight">{strings.reportMileDebtDesc}</p>
+                <p className="text-xs font-black text-[#221F20]">Savings Streak</p>
+                <p className="text-[9.5px] text-[#727272] font-medium leading-tight">Current Tier: {membershipTier}</p>
               </div>
-              <Badge className="bg-gradient-to-r from-[#DF0059] to-[#E06E9C] text-white font-black text-[9px] border-none shadow-sm shadow-[#DF0059]/15 py-1 px-2.5">
-                RM 45 Saved
-              </Badge>
+              <div className="flex flex-col gap-1 items-end">
+                <Badge className="bg-gradient-to-r from-[#DF0059] to-[#E06E9C] text-white font-black text-[9px] border-none shadow-sm shadow-[#DF0059]/15 py-1 px-2.5">
+                  {currentStreak} Days
+                </Badge>
+                {highestStreak > 0 && <span className="text-[8px] text-[#727272] font-bold">Highest: {highestStreak}</span>}
+              </div>
             </div>
           </CardContent>
         </Card>
@@ -310,21 +359,27 @@ export function Insights() {
           <div className="flex items-center gap-6">
             <div className="w-24 h-24 shrink-0 relative flex items-center justify-center">
               {mounted ? (
-                <ResponsiveContainer width="100%" height="100%">
-                  <PieChart>
-                    <Pie
-                      data={categoryData}
-                      innerRadius={30}
-                      outerRadius={45}
-                      paddingAngle={5}
-                      dataKey="value"
-                    >
-                      {categoryData.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
-                      ))}
-                    </Pie>
-                  </PieChart>
-                </ResponsiveContainer>
+                displayCategoryData.length > 0 ? (
+                  <ResponsiveContainer width="100%" height="100%">
+                    <PieChart>
+                      <Pie
+                        data={displayCategoryData}
+                        innerRadius={30}
+                        outerRadius={45}
+                        paddingAngle={5}
+                        dataKey="value"
+                      >
+                        {displayCategoryData.map((entry, index) => (
+                          <Cell key={`cell-${index}`} fill={entry.color} strokeWidth={0} />
+                        ))}
+                      </Pie>
+                    </PieChart>
+                  </ResponsiveContainer>
+                ) : (
+                  <div className="w-full h-full rounded-full border-4 border-slate-100/20 flex items-center justify-center">
+                    <span className="text-[10px] text-muted-foreground">Empty</span>
+                  </div>
+                )
               ) : (
                 <div className="w-full h-full rounded-full bg-slate-100/10 animate-pulse" />
               )}
@@ -335,7 +390,7 @@ export function Insights() {
               </div>
             </div>
             <div className="flex-1 space-y-2">
-              {categoryData.map((cat) => (
+              {displayCategoryData.length > 0 ? displayCategoryData.map((cat) => (
                 <div key={cat.name} className="flex justify-between items-center text-[10px] p-1 rounded-lg transition-colors hover:bg-slate-50">
                   <div className="flex items-center gap-2">
                     <div className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
@@ -345,8 +400,11 @@ export function Insights() {
                     <span className="font-black text-[#221F20]">RM {cat.value}</span>
                     <span className="text-[8px] font-semibold text-[#727272]">({Math.round((cat.value / 950) * 100)}%)</span>
                   </div>
+                  <span className="font-bold">RM {cat.value.toFixed(2)}</span>
                 </div>
-              ))}
+              )) : (
+                <div className="text-xs text-muted-foreground text-center py-4">No expenses recorded yet.</div>
+              )}
             </div>
           </div>
         </Card>
