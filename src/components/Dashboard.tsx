@@ -68,9 +68,9 @@ export function Dashboard() {
     if (!shareCardRef.current) return;
     try {
       setIsGenerating(true);
-      const domtoimage = (await import('dom-to-image')).default;
-      const dataUrl = await domtoimage.toPng(shareCardRef.current, {
-        quality: 1.0,
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(shareCardRef.current, {
+        pixelRatio: 2,
         width: 360,
         height: 640,
         style: {
@@ -114,9 +114,9 @@ export function Dashboard() {
     if (!shareCardRef.current) return;
     try {
       setIsGenerating(true);
-      const domtoimage = (await import('dom-to-image')).default;
-      const dataUrl = await domtoimage.toPng(shareCardRef.current, {
-        quality: 1.0,
+      const { toPng } = await import('html-to-image');
+      const dataUrl = await toPng(shareCardRef.current, {
+        pixelRatio: 2,
         width: 360,
         height: 640,
         style: {
@@ -621,8 +621,8 @@ export function Dashboard() {
         )}
       </AnimatePresence>
 
-      {/* Off-screen but in-viewport rendering container to avoid dom-to-image clipping/black-side defects */}
-      <div className="fixed left-0 top-0 pointer-events-none opacity-0 z-[-100] overflow-hidden">
+      {/* Off-screen rendering container to ensure browsers (especially mobile Safari) fully layout and render image assets without opacity clipping */}
+      <div className="fixed -left-[400px] top-0 pointer-events-none z-[-100] overflow-hidden">
         <StreakShareCard
           ref={shareCardRef}
           currentStreak={currentStreak}
