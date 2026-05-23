@@ -25,7 +25,7 @@ export function Savings() {
   const [isAutoSaveModalOpen, setIsAutoSaveModalOpen] = useState(false)
   const [selectedPocket, setSelectedPocket] = useState<SavingsPocket | null>(null)
   const [editPocket, setEditPocket] = useState<SavingsPocket | null>(null)
-  
+
   // Hydration guard for Next.js persisted state
   const [hasHydrated, setHasHydrated] = useState(false)
   useEffect(() => {
@@ -93,7 +93,7 @@ export function Savings() {
             {strings.saveSubheader}
           </p>
         </div>
-        <button 
+        <button
           onClick={handleAddPocket}
           className="w-10 h-10 rounded-full bg-gradient-to-br from-[#DF0059] to-[#CC0D5A] hover:from-[#CC0D5A] hover:to-[#DF0059] flex items-center justify-center text-white shadow-lg shadow-[#DF0059]/20 hover:scale-110 active:scale-95 transition-all duration-300"
         >
@@ -108,6 +108,7 @@ export function Savings() {
           isAutoSaveActive 
             ? "bg-gradient-to-r from-[#FFE9F2] via-[#FAE7EF]/50 to-[#FFE9F2]/20 border-[#F5CFDE] shadow-lg shadow-[#DF0059]/5" 
             : "bg-white/70 border-slate-200/80 opacity-90 shadow-sm"
+
         )}>
           <CardContent className="p-4 flex justify-between items-center">
             <div className="space-y-1">
@@ -122,6 +123,7 @@ export function Savings() {
               </div>
               <p className="text-[10px] text-[#727272] font-semibold leading-normal max-w-[240px]">
                 {isAutoSaveActive 
+
                   ? `Moving RM ${autoSaveAmount.toFixed(2)} ${autoSaveFrequency} to ${autoSaveTargetIds.length === savingsPockets.length ? "All Pockets" : `${autoSaveTargetIds.length} Pockets`}`
                   : "Automatically grow your savings while you sleep."
                 }
@@ -129,21 +131,22 @@ export function Savings() {
             </div>
             <div className="flex items-center gap-1.5">
               {isAutoSaveActive && (
-                <button 
+                <button
                   onClick={() => setIsAutoSaveModalOpen(true)}
                   className="p-1.5 rounded-xl hover:bg-[#FFE9F2] text-[#727272] hover:text-[#DF0059] transition-all"
                 >
                   <Pencil className="w-3.5 h-3.5" />
                 </button>
               )}
-              <Button 
-                size="sm" 
+              <Button
+                size="sm"
                 onClick={handleToggleAutoSave}
                 className={cn(
                   "text-[9px] h-7 font-black transition-all px-4 rounded-xl shadow-md uppercase tracking-wider",
                   isAutoSaveActive 
                     ? "bg-[#DF0059]/10 text-[#DF0059] border border-[#DF0059]/20 hover:bg-rose-500/10 hover:text-rose-500 hover:border-rose-500/20 shadow-none" 
                     : "bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] text-white shadow-[#DF0059]/20 hover:scale-105"
+
                 )}
               >
                 {isAutoSaveActive ? "Stop" : "Activate"}
@@ -195,6 +198,7 @@ export function Savings() {
                             : isGrowth 
                               ? "bg-gradient-to-br from-[#FFE9F2] to-[#F5CFDE] text-[#DF0059] scale-105 shadow-inner" 
                               : "bg-[#F8F8F8] text-[#221F20]"
+
                         )}>
                           {pocket.icon}
                         </div>
@@ -203,6 +207,7 @@ export function Savings() {
                             animate={{ scale: [1, 1.2, 1] }}
                             transition={{ repeat: Infinity, duration: 2 }}
                             className="absolute -top-1.5 -right-1.5 w-4.5 h-4.5 bg-emerald-500 rounded-full border-2 border-white flex items-center justify-center shadow-sm"
+
                           >
                             <div className="w-1.5 h-1.5 bg-white rounded-full animate-pulse" />
                           </motion.div>
@@ -215,16 +220,19 @@ export function Savings() {
                           </p>
                           {isMain && (
                             <Badge className="text-[8px] h-4 bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] text-white border-none shadow-sm shadow-[#DF0059]/20 px-2 font-black uppercase tracking-wider animate-pulse shrink-0">
+
                               🎯 Primary
                             </Badge>
                           )}
                           {isGrowth && (
                             <Badge className="text-[8px] h-4 bg-[#E9F2FE] text-[#237AF9] border border-[#D3E4FE] px-1.5 font-black shrink-0">
+
                               {strings.saveInvestedBadge}
                             </Badge>
                           )}
                           {isActive && (
                             <span className="text-[8px] font-bold uppercase tracking-tighter px-1.5 py-0.5 rounded-full bg-emerald-500/10 text-emerald-600 border border-emerald-500/20 shrink-0">
+
                               ✨ Funding
                             </span>
                           )}
@@ -235,6 +243,7 @@ export function Savings() {
                           </p>
                           {isGrowth && (
                             <span className="text-[8px] text-emerald-600 font-extrabold">+4.2% p.a.</span>
+
                           )}
                         </div>
                       </div>
@@ -282,6 +291,7 @@ export function Savings() {
                     <div className="flex items-center gap-2">
                       {isGrowth && (
                         <div className="flex items-center gap-1 text-[9px] text-emerald-600 font-bold bg-emerald-500/5 px-2 py-0.5 rounded-full border border-emerald-500/10">
+
                           <TrendingUp className="w-2.5 h-2.5" /> Growth Enabled
                         </div>
                       )}
@@ -291,6 +301,7 @@ export function Savings() {
                       className={cn("text-[10px] text-[#DF0059] font-black flex items-center gap-1 hover:gap-1.5 transition-all duration-300", isMain && "text-[#CC0D5A]")}
                     >
                       {strings.saveAddFunds} <ArrowUpRight className="w-3.5 h-3.5" />
+
                     </button>
                   </div>
                 </CardContent>
@@ -300,9 +311,9 @@ export function Savings() {
         })}
       </div>
 
-      <SavingsModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
+      <SavingsModal
+        isOpen={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
         editPocket={editPocket}
       />
 

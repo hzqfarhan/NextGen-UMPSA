@@ -196,27 +196,48 @@ export function Dashboard() {
     useStore.getState().updateNextGenScore()
   }, [])
 
+  const getToday = () => new Date();
+
   const getDaysRemaining = () => {
+    const today = getToday();
+
     if (user.incomeSource === "fixed" && user.fixedFrequency === "weekly" && user.weeklyPayDay) {
       const daysMap: Record<string, number> = {
         sunday: 0, monday: 1, tuesday: 2, wednesday: 3, thursday: 4, friday: 5, saturday: 6
       };
       const targetIndex = daysMap[user.weeklyPayDay.toLowerCase()] ?? 5;
-      const today = new Date();
       const todayIndex = today.getDay();
       let diff = targetIndex - todayIndex;
-      if (diff <= 0) {
-        diff += 7;
-      }
+      if (diff <= 0) diff += 7;
       return diff;
     }
 
+    if (user.incomeSource === "irregular" || user.incomeSource === "lump-sum") {
+      const startStr = user.lumpStartDate || user.setupDate;
+      if (!startStr) return user.durationDays || 30;
+      
+      let start = new Date(startStr);
+      const duration = user.durationDays || 30;
+      let end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
+      
+      while (end.getTime() <= today.getTime()) {
+        start = new Date(end);
+        end = new Date(start.getTime() + duration * 24 * 60 * 60 * 1000);
+      }
+      
+      const diffTime = end.getTime() - today.getTime();
+      return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+    }
+
     if (!user.nextAllowanceDate) return 14;
-    const today = new Date();
-    const nextDate = new Date(user.nextAllowanceDate);
+    let nextDate = new Date(user.nextAllowanceDate);
+    
+    while (nextDate.getTime() <= today.getTime()) {
+      nextDate.setMonth(nextDate.getMonth() + 1);
+    }
+
     const diffTime = nextDate.getTime() - today.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays > 0 ? diffDays : 30;
+    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
   }
 
   const getPlanName = () => {
