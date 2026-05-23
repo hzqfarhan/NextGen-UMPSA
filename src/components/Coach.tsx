@@ -6,7 +6,7 @@ import { Badge } from "@/components/ui/badge"
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
-import { User, Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe } from "lucide-react"
+import { Shield, Brain, Target, TrendingUp, Send, ChevronLeft, ChevronRight, ExternalLink, ShoppingBag, Store, Globe } from "lucide-react"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { cn } from "@/lib/utils"
@@ -678,31 +678,32 @@ export function Coach() {
   ]
 
   return (
-    <div className="fixed inset-0 flex flex-col max-w-lg mx-auto overflow-hidden bg-black z-50">
+    <div className="fixed inset-0 flex flex-col max-w-lg mx-auto overflow-hidden bg-[#FFE9F2] text-[#221F20] z-50 [color-scheme:light]">
       <img
         src={`${basePath}/assets/bot.gif`}
         alt=""
         aria-hidden="true"
-        className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 pointer-events-none"
+        className="absolute inset-0 w-full h-full object-cover z-0 opacity-18 mix-blend-soft-light pointer-events-none"
       />
+      <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_48%,rgba(223,0,89,0.18),transparent_28%),linear-gradient(180deg,rgba(255,255,255,0.90),rgba(255,233,242,0.86))]" />
       {/* Top Header */}
-      <header className="p-4 bg-black/40 backdrop-blur-xl border-b border-white/10 shadow-sm z-20 shrink-0">
+      <header className="p-4 bg-white/88 backdrop-blur-xl border-b border-pink-100 shadow-sm shadow-pink-100/40 z-20 shrink-0">
         <div className="flex justify-between items-center">
           <div className="flex items-center gap-3">
             <Link
               href="/dashboard"
-              className="w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 hover:bg-slate-200 dark:bg-white/5 dark:hover:bg-white/10 transition-colors"
+              className="w-10 h-10 rounded-full flex items-center justify-center bg-[#F8F8F8] hover:bg-[#FFE9F2] border border-pink-100 transition-colors"
             >
-              <ChevronLeft className="w-5 h-5 text-slate-600 dark:text-slate-300" />
+              <ChevronLeft className="w-5 h-5 text-[#727272]" />
             </Link>
             <div className="w-10 h-10 flex items-center justify-center">
               <Pet animation={(pet.animation as any) || (isThinking ? "think" : "idle")} size={40} />
             </div>
             <div>
-              <h1 className="text-lg font-bold leading-tight">{strings.coachHeader}</h1>
+              <h1 className="text-lg font-bold leading-tight text-[#221F20]">{strings.coachHeader}</h1>
               <div className="flex items-center gap-1.5">
                 <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
-                <p className="text-[10px] text-muted-foreground uppercase tracking-widest font-bold">Active</p>
+                <p className="text-[10px] text-[#727272] uppercase tracking-widest font-bold">Active</p>
               </div>
             </div>
           </div>
@@ -724,10 +725,10 @@ export function Coach() {
               exit={{ opacity: 0, scale: 0.8, y: 10 }}
               transition={{ duration: 0.2 }}
               onClick={scrollToBottom}
-              className="absolute bottom-4 right-4 z-30 w-9 h-9 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center shadow-lg hover:bg-white/20 active:scale-95 transition-colors"
+              className="absolute bottom-4 right-4 z-30 w-9 h-9 rounded-full bg-white/90 border border-pink-100 backdrop-blur-md flex items-center justify-center shadow-lg shadow-pink-100/60 hover:bg-white active:scale-95 transition-colors"
               aria-label="Scroll to bottom"
             >
-              <ChevronLeft className="w-4 h-4 text-white rotate-[-90deg]" />
+              <ChevronLeft className="w-4 h-4 text-primary rotate-[-90deg]" />
             </motion.button>
           )}
         </AnimatePresence>
@@ -749,8 +750,8 @@ export function Coach() {
                 className="flex flex-col justify-center h-full pt-10"
               >
                 <div className="mb-8">
-                  <h2 className="text-xl font-medium text-muted-foreground mb-1">Hi {user.name}</h2>
-                  <h1 className="text-3xl font-bold tracking-tight">Where should we start?</h1>
+                  <h2 className="text-xl font-medium text-[#727272] mb-1">Hi {user.name}</h2>
+                  <h1 className="text-3xl font-black tracking-tight text-[#221F20]">Where should we start?</h1>
                 </div>
 
                 <div className="space-y-3">
@@ -761,12 +762,12 @@ export function Coach() {
                       transition={{ delay: i * 0.1 }}
                       key={prompt.text}
                       onClick={() => sendMessage(prompt.text)}
-                      className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white dark:bg-white/5 border border-slate-200 dark:border-white/10 hover:bg-slate-50 dark:hover:bg-white/10 transition-all text-left group"
+                      className="w-full flex items-center gap-4 p-4 rounded-2xl bg-white/90 border border-white/80 hover:bg-white transition-all text-left group shadow-sm shadow-pink-100/50"
                     >
-                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center bg-slate-100 dark:bg-black/20 shrink-0", prompt.color)}>
+                      <div className={cn("w-10 h-10 rounded-full flex items-center justify-center bg-[#F8F8F8] shrink-0", prompt.color)}>
                         <prompt.icon className="w-5 h-5" />
                       </div>
-                      <span className="text-sm font-medium text-slate-700 dark:text-slate-200 group-hover:text-primary transition-colors">
+                      <span className="text-sm font-bold text-[#555555] group-hover:text-primary transition-colors">
                         {prompt.text}
                       </span>
                     </motion.button>
@@ -803,16 +804,23 @@ export function Coach() {
                       )}>
                         <div className={cn(
                           "w-8 h-8 rounded-full flex items-center justify-center shrink-0 border shadow-sm",
-                          m.role === 'assistant' ? cn(agent?.bg, "border-white/20") : "bg-slate-200 border-slate-300 text-slate-600"
+                          m.role === 'assistant' ? cn(agent?.bg, "border-pink-100") : "bg-[#F8F8F8] border-pink-100 text-[#727272]"
                         )}>
                           {m.role === 'assistant' ? (
                             agent ? <agent.icon className={cn("w-4 h-4", agent.color)} /> : <Pet animation="idle" size={32} />
-                          ) : <User className="w-4 h-4" />}
+                          ) : (
+                            <img
+                              src={`${basePath}/assets/pfp/user.png`}
+                              alt=""
+                              aria-hidden="true"
+                              className="w-full h-full rounded-full object-cover"
+                            />
+                          )}
                         </div>
                         <div className={cn("flex flex-col gap-3 max-w-[90%]", m.role === 'user' ? "items-end" : "items-start")}>
                           <div className={cn(
                             "p-3 rounded-2xl text-[11px] leading-relaxed shadow-sm w-fit",
-                            m.role === 'assistant' ? "bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-white/5" : "bg-primary text-white font-medium"
+                            m.role === 'assistant' ? "bg-white/95 border border-pink-100 text-[#221F20]" : "bg-primary text-white font-medium"
                           )}>
                             {m.content}
                           </div>
@@ -842,17 +850,17 @@ export function Coach() {
                               className="w-full max-w-[280px]"
                             >
                               {m.proposal.type === 'list_pockets' ? (
-                                <Card className="glass-card bg-slate-900/40 border-emerald-500/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-emerald-500/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-3">
                                     {savingsPockets.map((pocket) => (
-                                      <div key={pocket.id} className="p-3 rounded-2xl bg-white/5 border border-white/10 shadow-sm">
+                                      <div key={pocket.id} className="p-3 rounded-2xl bg-emerald-500/5 border border-emerald-500/15 shadow-sm">
                                         <div className="flex items-center gap-3 mb-2">
                                           <div className="w-10 h-10 rounded-xl bg-emerald-500/20 flex items-center justify-center text-xl">
                                             {pocket.icon}
                                           </div>
                                           <div className="flex-1">
                                             <div className="flex justify-between items-center">
-                                              <h4 className="text-xs font-bold text-white">{pocket.name}</h4>
+                                              <h4 className="text-xs font-bold text-[#221F20]">{pocket.name}</h4>
                                               <span className="text-[10px] font-black text-emerald-500">
                                                 {Math.round((pocket.current / pocket.target) * 100)}%
                                               </span>
@@ -862,7 +870,7 @@ export function Coach() {
                                             </p>
                                           </div>
                                         </div>
-                                        <div className="h-1.5 w-full bg-white/5 rounded-full overflow-hidden">
+                                        <div className="h-1.5 w-full bg-emerald-500/10 rounded-full overflow-hidden">
                                           <motion.div
                                             initial={{ width: 0 }}
                                             animate={{ width: `${(pocket.current / pocket.target) * 100}%` }}
@@ -882,11 +890,11 @@ export function Coach() {
                                   </CardContent>
                                 </Card>
                               ) : m.proposal.type === 'affordability' ? (
-                                <Card className="glass-card bg-slate-900/40 border-pink-600/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-pink-600/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-4">
                                     <div className="flex items-center gap-2 mb-2">
                                       <Shield className="w-4 h-4 text-pink-600" />
-                                      <p className="text-xs font-bold text-white uppercase tracking-wider">Affordability Simulator</p>
+                                      <p className="text-xs font-bold text-[#221F20] uppercase tracking-wider">Affordability Simulator</p>
                                     </div>
 
                                     <div className="space-y-3">
@@ -897,7 +905,7 @@ export function Coach() {
                                           value={m.proposal.item || (i === messages.length - 1 ? affordItem : "")}
                                           onChange={(e) => setAffordItem(e.target.value)}
                                           disabled={isExecuting || i < messages.length - 1}
-                                          className="h-10 text-sm bg-white/15 border-white/25 !text-white placeholder:text-white/40 disabled:!opacity-70"
+                                          className="h-10 text-sm bg-white border-pink-100 text-[#221F20] placeholder:text-[#727272] disabled:!opacity-70"
                                         />
                                       </div>
                                       <div className="space-y-1">
@@ -908,7 +916,7 @@ export function Coach() {
                                           value={m.proposal.price || (i === messages.length - 1 ? affordPrice : "")}
                                           onChange={(e) => setAffordPrice(e.target.value)}
                                           disabled={isExecuting || i < messages.length - 1}
-                                          className="h-10 text-sm bg-white/15 border-white/25 !text-white placeholder:text-white/40 disabled:!opacity-70"
+                                          className="h-10 text-sm bg-white border-pink-100 text-[#221F20] placeholder:text-[#727272] disabled:!opacity-70"
                                         />
                                       </div>
 
@@ -925,7 +933,7 @@ export function Coach() {
                                   </CardContent>
                                 </Card>
                               ) : m.proposal.type === 'affordability_result' ? (
-                                <Card className="glass-card bg-slate-900/40 border-pink-600/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-pink-600/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-3">
                                     {/* Status Header */}
                                     <div className="flex items-center justify-between">
@@ -935,7 +943,7 @@ export function Coach() {
                                           m.proposal.recommendation === "Avoid" ? "bg-rose-500" :
                                             m.proposal.recommendation === "Caution" ? "bg-amber-500" : "bg-emerald-500"
                                         )} />
-                                        <p className="text-[10px] font-bold text-white">{m.proposal.item}</p>
+                                        <p className="text-[10px] font-bold text-[#221F20]">{m.proposal.item}</p>
                                       </div>
                                       <Badge className={cn(
                                         "text-[7px] h-4 px-2 font-black uppercase tracking-wider border",
@@ -952,18 +960,18 @@ export function Coach() {
 
                                     {/* Metrics Row */}
                                     <div className="grid grid-cols-3 gap-1.5">
-                                      <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+                                      <div className="p-2 rounded-lg bg-[#F8F8F8] border border-pink-100 text-center">
                                         <p className="text-[7px] text-muted-foreground uppercase font-bold">Price</p>
-                                        <p className="text-[11px] font-bold text-white">RM {m.proposal.price?.toLocaleString()}</p>
+                                        <p className="text-[11px] font-bold text-[#221F20]">RM {m.proposal.price?.toLocaleString()}</p>
                                       </div>
-                                      <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+                                      <div className="p-2 rounded-lg bg-[#F8F8F8] border border-pink-100 text-center">
                                         <p className="text-[7px] text-muted-foreground uppercase font-bold">Daily After</p>
                                         <p className={cn("text-[11px] font-bold",
                                           parseFloat(m.proposal.newDailySpend) < 5 ? "text-rose-400" :
                                             parseFloat(m.proposal.newDailySpend) < 12 ? "text-amber-400" : "text-emerald-400"
                                         )}>RM {m.proposal.newDailySpend}</p>
                                       </div>
-                                      <div className="p-2 rounded-lg bg-white/5 border border-white/10 text-center">
+                                      <div className="p-2 rounded-lg bg-[#F8F8F8] border border-pink-100 text-center">
                                         <p className="text-[7px] text-muted-foreground uppercase font-bold">% Balance</p>
                                         <p className={cn("text-[11px] font-bold",
                                           (m.proposal.price / user.currentBalance * 100) > 30 ? "text-rose-400" : "text-emerald-400"
@@ -972,13 +980,13 @@ export function Coach() {
                                     </div>
 
                                     {/* Advice */}
-                                    <p className="text-[9px] text-white/60 leading-relaxed">
+                                    <p className="text-[9px] text-[#555555] leading-relaxed">
                                       {m.proposal.adviceSummary}
                                     </p>
 
                                     {/* Handoff indicator for risky purchases */}
                                     {(m.proposal.recommendation === "Avoid" || m.proposal.recommendation === "Caution") && (
-                                      <div className="pt-2 border-t border-white/10 flex items-center gap-2">
+                                      <div className="pt-2 border-t border-pink-100 flex items-center gap-2">
                                         <Brain className="w-3 h-3 text-amber-500 animate-pulse" />
                                         <p className="text-[8px] text-amber-400 font-bold">Handing off to Finance Strategist...</p>
                                       </div>
@@ -986,7 +994,7 @@ export function Coach() {
                                   </CardContent>
                                 </Card>
                               ) : m.proposal.type === 'strategist_alternative' ? (
-                                <Card className="glass-card bg-slate-900/40 border-amber-500/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-amber-500/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-3">
                                     {/* Strategist Header */}
                                     <div className="flex items-center justify-between">
@@ -1001,7 +1009,7 @@ export function Coach() {
                                       </Badge>
                                     </div>
 
-                                    <p className="text-[8px] text-white/40">Safe limit: RM {m.proposal.budgetLimit} (30% of balance). Tap to expand:</p>
+                                    <p className="text-[8px] text-[#727272]">Safe limit: RM {m.proposal.budgetLimit} (30% of balance). Tap to expand:</p>
 
                                     {/* Platform Accordion Stack */}
                                     <div className="space-y-2">
@@ -1028,7 +1036,7 @@ export function Coach() {
                                                 "w-full flex items-center justify-between p-3 rounded-xl border transition-all duration-200 text-left",
                                                 isSelected
                                                   ? `${colors.activeBg} ${colors.border} ring-1 ring-white/10`
-                                                  : "bg-white/5 border-white/10 hover:bg-white/10"
+                                                  : "bg-[#F8F8F8] border-pink-100 hover:bg-white"
                                               )}
                                             >
                                               <div className="flex items-center gap-3 min-w-0">
@@ -1036,11 +1044,11 @@ export function Coach() {
                                                   <PlatformIcon className={cn("w-4 h-4", colors.text)} />
                                                 </div>
                                                 <div className="flex flex-col min-w-0">
-                                                  <span className={cn("text-[10px] font-bold uppercase tracking-wider whitespace-nowrap", isSelected ? colors.text : "text-white/90")}>
+                                                  <span className={cn("text-[10px] font-bold uppercase tracking-wider whitespace-nowrap", isSelected ? colors.text : "text-[#555555]")}>
                                                     {alt.platform}
                                                   </span>
                                                   <div className="flex items-center gap-1.5 mt-0.5">
-                                                    <span className="text-[11px] font-black text-white shrink-0">RM {alt.price}</span>
+                                                    <span className="text-[11px] font-black text-[#221F20] shrink-0">RM {alt.price}</span>
                                                     <Badge className="text-[6.5px] h-3 px-1 bg-emerald-500/15 text-emerald-400 border-emerald-500/20 font-bold shrink-0">
                                                       Save {savePercent}%
                                                     </Badge>
@@ -1050,7 +1058,7 @@ export function Coach() {
 
                                               <motion.div
                                                 animate={{ rotate: isSelected ? 180 : 0 }}
-                                                className="text-white/20 shrink-0 ml-2"
+                                                className="text-[#727272]/50 shrink-0 ml-2"
                                               >
                                                 <ChevronLeft className="w-3.5 h-3.5 -rotate-90" />
                                               </motion.div>
@@ -1064,22 +1072,22 @@ export function Coach() {
                                                   exit={{ opacity: 0, height: 0 }}
                                                   className="overflow-hidden"
                                                 >
-                                                  <div className={cn("p-3 rounded-xl bg-gradient-to-br border border-white/10 flex flex-col gap-3", colors.gradient)}>
+                                                  <div className={cn("p-3 rounded-xl bg-gradient-to-br border border-pink-100 flex flex-col gap-3", colors.gradient)}>
                                                     {/* Big Product Image */}
-                                                    <div className="w-full aspect-[16/10] rounded-lg overflow-hidden border border-white/10 bg-black/20">
+                                                    <div className="w-full aspect-[16/10] rounded-lg overflow-hidden border border-pink-100 bg-[#F8F8F8]">
                                                       <img src={alt.image} alt={alt.name} className="w-full h-full object-cover" />
                                                     </div>
 
                                                     {/* Product Info Stack */}
                                                     <div className="space-y-0.5">
-                                                      <p className="text-[11px] text-white font-bold leading-tight">{alt.name}</p>
-                                                      <p className="text-[9px] text-white/50">{alt.condition}</p>
+                                                      <p className="text-[11px] text-[#221F20] font-bold leading-tight">{alt.name}</p>
+                                                      <p className="text-[9px] text-[#727272]">{alt.condition}</p>
                                                     </div>
 
                                                     {/* Interactive Row (Pills in one row) */}
                                                     <div className="flex items-center gap-1.5 pt-1">
-                                                      <div className="px-3 py-1.5 rounded-full bg-white/5 border border-white/10 shrink-0">
-                                                        <span className="text-[10px] font-black text-white">RM {alt.price}</span>
+                                                      <div className="px-3 py-1.5 rounded-full bg-white border border-pink-100 shrink-0">
+                                                        <span className="text-[10px] font-black text-[#221F20]">RM {alt.price}</span>
                                                       </div>
                                                       <Button
                                                         onClick={() => window.open(alt.link, "_blank")}
@@ -1099,32 +1107,32 @@ export function Coach() {
                                   </CardContent>
                                 </Card>
                               ) : m.proposal.type === 'deposit_summary' ? (
-                                <Card className="glass-card bg-slate-900/40 border-emerald-500/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-emerald-500/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-3">
                                     <div className="flex items-center gap-2 mb-2">
                                       <div className="w-8 h-8 rounded-full bg-emerald-500/20 flex items-center justify-center">
                                         <TrendingUp className="w-4 h-4 text-emerald-500" />
                                       </div>
-                                      <p className="text-[10px] font-black text-white uppercase tracking-widest">Impact Summary</p>
+                                      <p className="text-[10px] font-black text-[#221F20] uppercase tracking-widest">Impact Summary</p>
                                     </div>
                                     
-                                    <div className="rounded-xl bg-black/30 border border-white/5 overflow-hidden">
+                                    <div className="rounded-xl bg-[#F8F8F8] border border-pink-100 overflow-hidden">
                                       <table className="w-full text-[10px]">
                                         <thead>
-                                          <tr className="text-left border-b border-white/10 bg-white/5">
+                                          <tr className="text-left border-b border-pink-100 bg-white">
                                             <th className="p-2.5 font-bold text-muted-foreground">Metric</th>
                                             <th className="p-2.5 font-bold text-muted-foreground text-right">Before</th>
                                             <th className="p-2.5 font-bold text-muted-foreground text-right">After</th>
                                           </tr>
                                         </thead>
-                                        <tbody className="divide-y divide-white/5">
+                                        <tbody className="divide-y divide-pink-100">
                                           <tr>
-                                            <td className="p-2.5 text-white font-medium">Spending Bal.</td>
+                                            <td className="p-2.5 text-[#221F20] font-medium">Spending Bal.</td>
                                             <td className="p-2.5 text-right text-muted-foreground">RM {(m.proposal.before?.balance || 0).toFixed(2)}</td>
                                             <td className="p-2.5 text-right text-emerald-400 font-bold">RM {(m.proposal.after?.balance || 0).toFixed(2)}</td>
                                           </tr>
                                           <tr>
-                                            <td className="p-2.5 text-white font-medium">Daily Quota</td>
+                                            <td className="p-2.5 text-[#221F20] font-medium">Daily Quota</td>
                                             <td className="p-2.5 text-right text-muted-foreground">
                                               {(m.proposal.before?.quota || 0) < 0 ? "-" : ""}RM {Math.abs(m.proposal.before?.quota || 0).toFixed(2)}
                                             </td>
@@ -1136,7 +1144,7 @@ export function Coach() {
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td className="p-2.5 text-white font-medium">Safe Daily (Avg)</td>
+                                            <td className="p-2.5 text-[#221F20] font-medium">Safe Daily (Avg)</td>
                                             <td className="p-2.5 text-right text-muted-foreground">RM {(m.proposal.before?.safeDaily || 0).toFixed(2)}</td>
                                             <td className="p-2.5 text-right text-emerald-400 font-bold">RM {(m.proposal.after?.safeDaily || 0).toFixed(2)}</td>
                                           </tr>
@@ -1150,25 +1158,25 @@ export function Coach() {
                                   </CardContent>
                                 </Card>
                               ) : m.proposal.type === 'strategist_goal_planner' ? (
-                                <Card className="glass-card bg-slate-900/40 border-amber-500/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-amber-500/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-4">
                                     <div className="flex items-center gap-2 mb-2">
                                       <div className="w-8 h-8 rounded-full bg-amber-500/20 flex items-center justify-center">
                                         <Target className="w-4 h-4 text-amber-500" />
                                       </div>
-                                      <p className="text-[10px] font-black text-white uppercase tracking-widest">Goal Acceleration Plan</p>
+                                      <p className="text-[10px] font-black text-[#221F20] uppercase tracking-widest">Goal Acceleration Plan</p>
                                     </div>
                                     
                                     <div className="grid grid-cols-3 gap-2">
-                                      <div className="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                                      <div className="bg-amber-500/5 rounded-xl p-2 border border-amber-500/15 text-center">
                                         <p className="text-[8px] text-muted-foreground uppercase font-bold mb-1">Daily</p>
                                         <p className="text-[11px] font-black text-amber-400">RM {m.proposal.daily.toFixed(2)}</p>
                                       </div>
-                                      <div className="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                                      <div className="bg-amber-500/5 rounded-xl p-2 border border-amber-500/15 text-center">
                                         <p className="text-[8px] text-muted-foreground uppercase font-bold mb-1">Weekly</p>
                                         <p className="text-[11px] font-black text-amber-400">RM {m.proposal.weekly.toFixed(2)}</p>
                                       </div>
-                                      <div className="bg-white/5 rounded-xl p-2 border border-white/5 text-center">
+                                      <div className="bg-amber-500/5 rounded-xl p-2 border border-amber-500/15 text-center">
                                         <p className="text-[8px] text-muted-foreground uppercase font-bold mb-1">Monthly</p>
                                         <p className="text-[11px] font-black text-amber-400">RM {m.proposal.monthly.toFixed(2)}</p>
                                       </div>
@@ -1189,7 +1197,7 @@ export function Coach() {
 
                                  return (
                                    <Card className={cn(
-                                     "glass-card bg-slate-900/40 overflow-hidden",
+                                     "glass-card bg-white/95 overflow-hidden",
                                      isRestricted ? "border-rose-500/20" : "border-emerald-500/20"
                                    )}>
                                      <CardContent className="p-4 space-y-4">
@@ -1198,13 +1206,13 @@ export function Coach() {
                                            {m.proposal.icon}
                                          </div>
                                          <div className="flex-1">
-                                           <p className="text-xs font-bold text-white">Quick Deposit to {m.proposal.pocketName}</p>
+                                           <p className="text-xs font-bold text-[#221F20]">Quick Deposit to {m.proposal.pocketName}</p>
                                            <p className="text-[9px] text-emerald-500 font-bold">RM {m.proposal.amount.toFixed(2)}</p>
                                          </div>
                                          <Shield className="w-5 h-5 text-emerald-500/60" />
                                        </div>
                                        
-                                       <div className="flex justify-between items-center bg-black/20 p-2 rounded-lg border border-white/5">
+                                       <div className="flex justify-between items-center bg-[#F8F8F8] p-2 rounded-lg border border-pink-100">
                                            <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">Resilience Check</span>
                                            <Badge 
                                              variant="outline" 
@@ -1233,7 +1241,7 @@ export function Coach() {
                                            className={cn(
                                              "flex-1 h-8 text-[10px] text-white font-bold",
                                              isRestricted 
-                                               ? "bg-rose-900/50 hover:bg-rose-900/50 cursor-not-allowed text-white/50" 
+                                               ? "bg-rose-500/20 hover:bg-rose-500/20 cursor-not-allowed text-rose-300" 
                                                : "bg-emerald-600 hover:bg-emerald-700"
                                            )}
                                            onClick={() => handleAction({
@@ -1248,7 +1256,7 @@ export function Coach() {
                                          </Button>
                                          <Button
                                            variant="outline"
-                                           className="flex-1 h-8 text-[10px] border-white/10 text-white"
+                                           className="flex-1 h-8 text-[10px] border-pink-100 text-[#555555] hover:bg-pink-50"
                                            onClick={() => handleAction({ id: 'decline_save', label: 'Decline', type: 'postpone' })}
                                            disabled={isExecuting || i < messages.length - 1}
                                          >
@@ -1266,7 +1274,7 @@ export function Coach() {
 
                                 return (
                                   <Card className={cn(
-                                    "glass-card bg-slate-900/40 overflow-hidden",
+                                    "glass-card bg-white/95 overflow-hidden",
                                     isRestricted ? "border-rose-500/20" : "border-emerald-500/20"
                                   )}>
                                     <CardContent className="p-4 space-y-4">
@@ -1275,7 +1283,7 @@ export function Coach() {
                                           {m.proposal.icon}
                                         </div>
                                         <div className="flex-1">
-                                          <p className="text-xs font-bold text-white">{m.proposal.name}</p>
+                                          <p className="text-xs font-bold text-[#221F20]">{m.proposal.name}</p>
                                         </div>
                                         <Badge className="text-[7px] h-3 bg-emerald-500/20 text-emerald-500 border-emerald-500/20 px-1 font-black">
                                           {m.proposal.mode.toUpperCase()}
@@ -1290,7 +1298,7 @@ export function Coach() {
                                             value={i === messages.length - 1 ? saveTarget : m.proposal.target}
                                             onChange={(e) => setSaveTarget(e.target.value)}
                                             disabled={isExecuting || i < messages.length - 1}
-                                            className="h-10 text-sm bg-white/15 border-white/25 !text-white placeholder:text-white/40 disabled:!opacity-70"
+                                            className="h-10 text-sm bg-white border-pink-100 text-[#221F20] placeholder:text-[#727272] disabled:!opacity-70"
                                           />
                                         </div>
                                         <div className="space-y-1.5">
@@ -1300,7 +1308,7 @@ export function Coach() {
                                             value={i === messages.length - 1 ? saveDeposit : m.proposal.current}
                                             onChange={(e) => setSaveDeposit(e.target.value)}
                                             disabled={isExecuting || i < messages.length - 1}
-                                            className="h-10 text-sm bg-white/15 border-white/25 !text-white placeholder:text-white/40 disabled:!opacity-70"
+                                            className="h-10 text-sm bg-white border-pink-100 text-[#221F20] placeholder:text-[#727272] disabled:!opacity-70"
                                           />
                                         </div>
                                       </div>
@@ -1321,7 +1329,7 @@ export function Coach() {
                                             className={cn(
                                               "flex-1 h-8 text-[10px] text-white font-bold",
                                               isRestricted 
-                                                ? "bg-rose-900/50 hover:bg-rose-900/50 cursor-not-allowed text-white/50" 
+                                                ? "bg-rose-500/20 hover:bg-rose-500/20 cursor-not-allowed text-rose-300" 
                                                 : "bg-emerald-600 hover:bg-emerald-700"
                                             )}
                                             onClick={() => handleAction({
@@ -1340,7 +1348,7 @@ export function Coach() {
                                           </Button>
                                           <Button
                                             variant="outline"
-                                            className="flex-1 h-8 text-[10px] border-white/10 text-white"
+                                            className="flex-1 h-8 text-[10px] border-pink-100 text-[#555555] hover:bg-pink-50"
                                             onClick={() => handleAction({ id: 'decline_save', label: 'Decline', type: 'postpone' })}
                                             disabled={isExecuting}
                                           >
@@ -1353,7 +1361,7 @@ export function Coach() {
                                 );
                               })()
                               : (
-                                <Card className="glass-card bg-slate-900/40 border-primary/20 overflow-hidden">
+                                <Card className="glass-card bg-white/95 border-primary/20 overflow-hidden">
                                   <CardContent className="p-4 space-y-3">
                                     <div className="flex items-center gap-3">
                                       <div className="w-10 h-10 rounded-xl bg-primary/20 flex items-center justify-center text-xl">
@@ -1361,7 +1369,7 @@ export function Coach() {
                                       </div>
                                       <div className="flex-1">
                                         <div className="flex items-center gap-2">
-                                          <p className="text-xs font-bold text-white">{m.proposal.name || (m.proposal.type === 'transfer' ? 'Money Move' : 'Pocket')}</p>
+                                          <p className="text-xs font-bold text-[#221F20]">{m.proposal.name || (m.proposal.type === 'transfer' ? 'Money Move' : 'Pocket')}</p>
                                           <Badge className="text-[7px] h-3 bg-primary/20 text-primary border-primary/20 px-1 font-black">
                                             {m.proposal.type === 'transfer' ? 'Verified' : 'Managed'}
                                           </Badge>
@@ -1394,11 +1402,11 @@ export function Coach() {
                                     {m.proposal.type === 'transfer' && (
                                       <div className="flex justify-between items-center text-[9px] py-1">
                                         <span className="text-muted-foreground">Amount to send</span>
-                                        <span className="text-white font-bold">RM {m.proposal.amount?.toFixed(2)}</span>
+                                        <span className="text-[#221F20] font-bold">RM {m.proposal.amount?.toFixed(2)}</span>
                                       </div>
                                     )}
 
-                                    <div className="flex justify-between items-center pt-2 border-t border-white/5">
+                                    <div className="flex justify-between items-center pt-2 border-t border-pink-100">
                                       <span className="text-[8px] text-emerald-500 font-bold flex items-center gap-1">
                                         {m.proposal.type === 'transfer' ? <Send className="w-2 h-2" /> : <TrendingUp className="w-2 h-2" />}
                                         {m.proposal.type === 'transfer' ? 'Security Cleared' : 'Growth Enabled'}
@@ -1441,7 +1449,7 @@ export function Coach() {
                       <div className="w-8 h-8 rounded-full flex items-center justify-center shrink-0 border bg-primary/10 border-primary/20">
                         <Pet animation="think" size={32} />
                       </div>
-                      <div className="p-3 rounded-2xl bg-white dark:bg-zinc-900/50 border border-slate-200 dark:border-white/5 flex gap-1 items-center shadow-sm">
+                      <div className="p-3 rounded-2xl bg-white/95 border border-pink-100 flex gap-1 items-center shadow-sm">
                         <span className="w-1 h-1 bg-primary rounded-full animate-bounce" />
                         <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:0.2s]" />
                         <span className="w-1 h-1 bg-primary rounded-full animate-bounce [animation-delay:0.4s]" />
@@ -1463,7 +1471,7 @@ export function Coach() {
       </div>
 
       {/* Sticky Chat Input Area — OUTSIDE the scroll container so it never disappears */}
-      <div className="bg-background/80 backdrop-blur-xl border-t border-border/50 p-4 pb-safe space-y-3 shrink-0 z-20">
+      <div className="bg-white/88 backdrop-blur-xl border-t border-pink-100 p-4 pb-safe space-y-3 shrink-0 z-20 shadow-[0_-12px_40px_rgba(204,13,90,0.08)]">
         <AnimatePresence>
           {messages.length > 0 && (
             <motion.div
@@ -1478,7 +1486,7 @@ export function Coach() {
                     key={suggestion}
                     disabled={isThinking}
                     onClick={() => sendMessage(suggestion)}
-                    className="inline-flex items-center rounded-full bg-white dark:bg-white/5 px-3 py-1.5 text-[10px] font-bold text-slate-600 dark:text-slate-300 hover:bg-primary hover:text-white transition-colors border border-slate-200 dark:border-white/10 shrink-0 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="inline-flex items-center rounded-full bg-white px-3 py-1.5 text-[10px] font-bold text-[#555555] hover:bg-primary hover:text-white transition-colors border border-pink-100 shrink-0 shadow-sm disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {suggestion}
                   </button>
@@ -1492,7 +1500,7 @@ export function Coach() {
           <Input
             placeholder={isThinking || isExecuting ? "Wait for the council..." : strings.coachInputPlaceholder}
             disabled={isThinking || isExecuting}
-            className="pr-12 bg-white dark:bg-zinc-900/50 border-slate-200 dark:border-white/10 h-12 rounded-2xl text-xs shadow-sm focus:ring-primary/20 disabled:bg-slate-50 dark:disabled:bg-white/5"
+            className="pr-12 bg-white border-pink-100 h-12 rounded-2xl text-xs text-[#221F20] placeholder:text-[#727272] shadow-sm shadow-pink-100/60 focus:border-primary focus:ring-primary/20 disabled:bg-[#F8F8F8]"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={(e) => e.key === 'Enter' && sendMessage()}

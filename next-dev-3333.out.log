@@ -1,0 +1,13 @@
+
+> beu-nextgen@0.1.0 dev
+> next dev -p 2221 -p 3333
+
+▲ Next.js 16.2.4 (Turbopack)
+- Local:         http://localhost:3333
+- Network:       http://169.254.115.98:3333
+✓ Ready in 752ms
+Creating turbopack project {
+  dir: 'C:\\Users\\haziq\\Desktop\\Project\\NextGen-UMPSA',
+  testMode: true
+}
+

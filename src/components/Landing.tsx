@@ -65,7 +65,7 @@ export default function Landing() {
           animate={{ opacity: 1, x: 0 }}
           className="flex items-center gap-1"
         >
-          <span className="text-2xl font-black tracking-tight text-primary">BeU NextGen</span>
+          <span className="text-2xl font-black tracking-tight text-primary">NextGen</span>
           <div className="w-1.5 h-1.5 bg-secondary rounded-full mt-2" />
         </motion.div>
         

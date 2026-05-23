@@ -1,0 +1,11 @@
+
+> beu-nextgen@0.1.0 dev
+> next dev -p 2221 --webpack -p 3334
+
+▲ Next.js 16.2.4 (webpack)
+- Local:         http://localhost:3334
+- Network:       http://169.254.115.98:3334
+✓ Ready in 785ms
+
+○ Compiling / ...
+ GET / 200 in 9.3s (next.js: 8.7s, application-code: 510ms)

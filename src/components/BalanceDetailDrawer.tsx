@@ -84,7 +84,7 @@ export function BalanceDetailDrawer({ open, onClose }: BalanceDetailDrawerProps)
                   <div>
                     <div className="flex items-center gap-2 mb-1">
                       <span className="text-sm font-semibold text-muted-foreground">
-                        {showSpendOnly ? 'Spendable Balance' : 'Total Assets'}
+                        {showSpendOnly ? 'Spendable' : 'Total Assets'}
                       </span>
                       <button 
                         onClick={() => setHideBalance(!hideBalance)}
@@ -125,6 +125,23 @@ export function BalanceDetailDrawer({ open, onClose }: BalanceDetailDrawerProps)
 
               {/* Sections */}
               <div className="px-6 py-4 space-y-1 max-h-[50vh] overflow-y-auto">
+                <div className="grid grid-cols-2 gap-2 pb-3">
+                  <div className="rounded-full border border-primary/20 bg-primary/5 px-3 py-2.5">
+                    <div className="flex items-center gap-1.5 text-primary">
+                      <Lock className="w-3.5 h-3.5" />
+                      <span className="text-[9px] font-black uppercase tracking-wider">Protected</span>
+                    </div>
+                    <p className="mt-1 text-sm font-black">{formatRM(lockedForBills)}</p>
+                  </div>
+
+                  <div className="rounded-full border border-pink-200 bg-pink-50/60 px-3 py-2.5">
+                    <div className="flex items-center gap-1.5 text-[#CC0D5A]">
+                      <Wallet className="w-3.5 h-3.5" />
+                      <span className="text-[9px] font-black uppercase tracking-wider">Spendable</span>
+                    </div>
+                    <p className="mt-1 text-sm font-black text-[#CC0D5A]">{formatRM(spendableBalance)}</p>
+                  </div>
+                </div>
                 
                 {/* Spend Section */}
                 <div className="py-3">

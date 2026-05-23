@@ -1,4 +1,4 @@
-"use client"
+﻿"use client"
 
 import { useState } from "react"
 import { Card, CardContent } from "@/components/ui/card"
@@ -12,7 +12,7 @@ import { useStore } from "@/store/useStore"
 export function Cards() {
   const { user } = useStore()
   const cardHolderName = (user?.name || "Aiman").toUpperCase()
-  const cardLastFour = user?.cardLastFour || "4292"
+  const cardLastFour = "1728"
 
   const [isDetailsVisible, setIsDetailsVisible] = useState(false)
   const [showAuthDialog, setShowAuthDialog] = useState(false)
@@ -158,10 +158,10 @@ export function Cards() {
           <div className="relative h-full flex flex-col justify-between">
             <div className="flex justify-between items-start">
               <div className="space-y-1">
-                <p className="text-[10px] opacity-70 uppercase tracking-widest font-bold">Virtual Card</p>
+                <p className="text-[10px] opacity-70 uppercase tracking-widest font-bold">Bank Islam</p>
                 <div className="flex items-center gap-2">
                   <Zap className="w-4 h-4 text-amber-300 fill-amber-300 animate-pulse" />
-                  <p className="text-lg font-extrabold">NextGen Virtual Card</p>
+                  <p className="text-lg font-extrabold">Virtual Card</p>
                 </div>
               </div>
               <div className="flex items-center justify-center">
@@ -176,7 +176,7 @@ export function Cards() {
                     filter: "drop-shadow(0 0 20px rgba(223,0,89,0.2))"
                   }}
                 >
-                  BeU NextGen
+                  NextGen
                 </h1>
               </div>
             </div>

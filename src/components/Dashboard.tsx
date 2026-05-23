@@ -5,7 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { motion, AnimatePresence } from "framer-motion"
-import { TrendingUp, AlertTriangle, ShieldCheck, Wallet, Settings as SettingsIcon, Send, History, CalendarClock, RefreshCw, Eye, EyeOff, Sparkles, LockKeyhole } from "lucide-react"
+import { TrendingUp, AlertTriangle, ShieldCheck, Wallet, Settings as SettingsIcon, Send, History, CalendarClock, RefreshCw, Eye, EyeOff, Sparkles } from "lucide-react"
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { SpendGuardModal } from "./BudgetGuardModal"
@@ -120,7 +120,7 @@ export function Dashboard() {
     <div className="p-4 space-y-6 pb-24 max-w-lg mx-auto">
       <header className="flex justify-between items-center">
         <div>
-          <h1 className="text-2xl font-bold tracking-tight">NextGen Command Center</h1>
+          <h1 className="text-2xl font-bold tracking-tight">NextGen</h1>
           <p className="text-muted-foreground text-sm font-medium text-primary/80">{strings.dashGreeting}, {user.name} · {getPlanName()}</p>
         </div>
         <div className="flex items-center gap-3">
@@ -147,7 +147,7 @@ export function Dashboard() {
           onClick={() => setShowBalanceDrawer(true)}
           className="cursor-pointer"
         >
-          <Card className="glass-card hover:ring-primary/30 transition-all active:scale-[0.98]">
+          <Card className="glass-card hover:ring-primary/30 transition-all active:scale-[0.98] h-full flex flex-col justify-between">
             <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between space-y-0">
               <CardTitle className="text-[10px] uppercase font-bold tracking-wider text-muted-foreground flex items-center gap-2">
                 <Wallet className="w-3 h-3" /> {showSpendOnly ? "Spendable Balance" : "Total Balance"}
@@ -162,14 +162,21 @@ export function Dashboard() {
                 {hideBalance ? <EyeOff className="w-3.5 h-3.5" /> : <Eye className="w-3.5 h-3.5" />}
               </button>
             </CardHeader>
-            <CardContent className="p-4">
-              <p className={cn(
-                "text-xl font-bold transition-colors duration-300",
-                showSpendOnly ? "text-emerald-500" : "text-foreground"
-              )}>
-                {hideBalance ? "••••••" : `RM ${(showSpendOnly ? spendableBalance : totalAssets).toFixed(2)}`}
-              </p>
-              <p className="text-[10px] text-muted-foreground">Total Balance shows everything you currently have.</p>
+            <CardContent className="p-4 pt-3 flex-1 flex flex-col justify-center">
+              <div>
+                <p className={cn(
+                  "text-xl font-black tracking-tight leading-none transition-colors duration-300",
+                  showSpendOnly ? "text-emerald-500" : "text-foreground"
+                )}>
+                  {hideBalance ? "••••••" : `RM ${(showSpendOnly ? spendableBalance : totalAssets).toFixed(2)}`}
+                </p>
+                <div className="flex items-center gap-1.5 mt-2">
+                  <span className="inline-flex items-center gap-1 text-[9px] font-semibold px-2 py-0.5 rounded-full bg-primary/10 text-primary border border-primary/20">
+                    <CalendarClock className="w-2.5 h-2.5 shrink-0" />
+                    {language === 'en' ? 'Next in' : 'Seterusnya dlm'} {getDaysRemaining()} {language === 'en' ? (getDaysRemaining() === 1 ? 'day' : 'days') : 'hari'}
+                  </span>
+                </div>
+              </div>
             </CardContent>
           </Card>
         </motion.div>
@@ -188,10 +195,10 @@ export function Dashboard() {
           >
             <CardHeader className="p-4 pb-0 flex flex-row items-center justify-between space-y-0">
               <CardTitle className={cn(
-                "text-[10px] uppercase font-bold tracking-wider flex items-center gap-1.5 transition-colors",
+                "text-[10px] uppercase font-bold tracking-wider flex items-center gap-1.5 transition-colors whitespace-nowrap min-w-0",
                 safeDailyView === 'quota' && quotaRemaining < 0 ? "text-rose-400" : "text-primary"
               )}>
-                <ShieldCheck className="w-3.5 h-3.5" /> {safeDailyView === 'quota' ? "Today's Safe Spend" : "Safe Daily Spend"}
+                <ShieldCheck className="w-3.5 h-3.5 shrink-0" /> {safeDailyView === 'quota' ? "Today's Quota" : "Safe Daily"}
               </CardTitle>
               {/* Segment Pill indicator */}
               <div className="text-[8px] font-extrabold px-1.5 py-0.5 rounded-full bg-foreground/5 text-muted-foreground/80 border border-border">
@@ -204,14 +211,14 @@ export function Dashboard() {
                   <>
                     <div className="flex items-center gap-2">
                       <p className={cn(
-                        "text-xl font-black text-glow tracking-tight leading-none",
-                        quotaRemaining < 0 ? "text-rose-500" : "text-emerald-400"
+                        "text-xl font-black tracking-tight leading-none",
+                        quotaRemaining < 0 ? "text-rose-500" : "text-primary"
                       )}>
                         {quotaRemaining < 0 ? "-" : ""}RM {Math.abs(quotaRemaining).toFixed(2)}
                       </p>
                       <RefreshCw className={cn(
                         "w-4 h-4 shrink-0 opacity-40 hover:opacity-100 transition-opacity",
-                        quotaRemaining < 0 ? "text-rose-400" : "text-emerald-400"
+                        quotaRemaining < 0 ? "text-rose-400" : "text-primary"
                       )} />
                     </div>
                     <p className="text-[9px] text-muted-foreground mt-1.5 leading-relaxed font-medium">
@@ -224,7 +231,7 @@ export function Dashboard() {
                 ) : (
                   <>
                     <div className="flex items-center gap-2">
-                      <p className="text-xl font-black text-primary text-glow tracking-tight leading-none">
+                      <p className="text-xl font-black text-primary tracking-tight leading-none">
                         RM {safeDailySpend.toFixed(2)}
                       </p>
                       <RefreshCw className="w-4 h-4 shrink-0 text-primary opacity-40 hover:opacity-100 transition-opacity" />
@@ -239,48 +246,6 @@ export function Dashboard() {
           </Card>
         </motion.div>
       </div>
-
-
-      <div className="grid grid-cols-3 gap-3">
-        <Card className="glass-card border-pink-200">
-          <CardContent className="p-3 space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Protected Commitments</p>
-            <div className="flex items-center gap-2">
-              <LockKeyhole className="w-4 h-4 text-primary" />
-              <p className="text-sm font-black">RM {lockedAmount.toFixed(2)}</p>
-            </div>
-            <p className="text-[9px] text-muted-foreground leading-snug">Funds reserved for bills, rent, goals, and future needs.</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-pink-100">
-          <CardContent className="p-3 space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Spendable Balance</p>
-            <p className="text-sm font-black text-[#CC0D5A]">RM {spendableBalance.toFixed(2)}</p>
-            <p className="text-[9px] text-muted-foreground leading-snug">Money you can use without touching important commitments.</p>
-          </CardContent>
-        </Card>
-        <Card className="glass-card border-amber-200">
-          <CardContent className="p-3 space-y-1">
-            <p className="text-[9px] font-black uppercase tracking-widest text-muted-foreground">Resilience Score</p>
-            <p className="text-sm font-black text-[#CC0D5A]">{resilienceScore}/100</p>
-            <p className="text-[9px] text-muted-foreground leading-snug">Your financial health for the rest of the month.</p>
-          </CardContent>
-        </Card>
-      </div>
-
-      <Card className="glass-card border-primary/20">
-        <CardContent className="p-4 flex items-start gap-3">
-          <div className="w-10 h-10 rounded-2xl bg-primary/10 flex items-center justify-center text-primary">
-            <Sparkles className="w-5 h-5" />
-          </div>
-          <div className="space-y-1">
-            <p className="text-sm font-black">NextGen Companion is focused.</p>
-            <p className="text-[11px] text-muted-foreground leading-relaxed">
-              Your money mood companion is tracking Safe Daily Spend, Smart Bill Lock, active Savings Missions, and upcoming financial pressure in real time.
-            </p>
-          </div>
-        </CardContent>
-      </Card>
 
       {/* Quick Actions */}
       <div className="grid grid-cols-4 gap-1">

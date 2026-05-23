@@ -1,0 +1,28 @@
+
+thread 'tokio-runtime-worker' (34504) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:966:13:
+Every task must have a task type TaskGuard { task_id: TaskId { id: 2147484326 }, storage: TaskStorage { leaf_distance: LeafDistance { distance: 0, max_distance_in_buffer: 0 }, aggregation_number: AggregationNumber { base: 0, distance: 0, effective: 0 }, output_dependent: {}, output: None, upper: CounterMap({}), persistent_task_type: None, flags: TaskFlags { .0: 24, invalidator: false, immutable: false, current_session_clean: false, meta_restored: true, data_restored: true, meta_modified: false, data_modified: false, meta_snapshot: false, data_snapshot: false, prefetched: false, stateful: false }, lazy: [InProgress(Scheduled { done_event: Event, reason: ActivateInitial })] } }
+note: run with `RUST_BACKTRACE=1` environment variable to display a backtrace
+
+thread 'tokio-runtime-worker' (33524) panicked at turbopack\crates\turbo-tasks-backend\src\backend\operation\mod.rs:966:13:
+Every task must have a task type TaskGuard { task_id: TaskId { id: 2147484198 }, storage: TaskStorage { leaf_distance: LeafDistance { distance: 0, max_distance_in_buffer: 0 }, aggregation_number: AggregationNumber { base: 0, distance: 0, effective: 0 }, output_dependent: {}, output: None, upper: CounterMap({}), persistent_task_type: None, flags: TaskFlags { .0: 24, invalidator: false, immutable: false, current_session_clean: false, meta_restored: true, data_restored: true, meta_modified: false, data_modified: false, meta_snapshot: false, data_snapshot: false, prefetched: false, stateful: false }, lazy: [InProgress(Scheduled { done_event: Event, reason: ActivateInitial })] } }
+Error: Can't resolve 'tailwindcss' in 'C:\Users\haziq\Desktop\Project'
+    [2m[at finishWithoutResolve (C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:909:18)][0m
+    [2m[at C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:1001:14][0m
+    [2m[at C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:1080:5][0m
+    [2m[at eval (eval at create (C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:15:1)][0m
+    [2m[at C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:1080:5][0m
+    [2m[at eval (eval at create (C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:16:1)][0m
+    [2m[at C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:1080:5][0m
+    [2m[at eval (eval at create (C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:15:1)][0m
+    [2m[at C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\enhanced-resolve\lib\Resolver.js:1080:5][0m
+    [2m[at eval (eval at create (C:\Users\haziq\Desktop\Project\NextGen-UMPSA\node_modules\tapable\lib\HookCodeFactory.js:31:10), <anonymous>:15:1)][0m {
+  details: "resolve 'tailwindcss' in 'C:\\Users\\haziq\\Desktop\\Project'\n" +
+    '  Parsed request is a module\n' +
+    '  No description file found in C:\\Users\\haziq\\Desktop\\Project or above\n' +
+    '  resolve as module\n' +
+    "    C:\\Users\\haziq\\Desktop\\Project\\node_modules doesn't exist or is not a directory\n" +
+    "    C:\\Users\\haziq\\Desktop\\node_modules doesn't exist or is not a directory\n" +
+    "    C:\\Users\\haziq\\node_modules doesn't exist or is not a directory\n" +
+    "    C:\\Users\\node_modules doesn't exist or is not a directory\n" +
+    "    C:\\node_modules doesn't exist or is not a directory"
+}

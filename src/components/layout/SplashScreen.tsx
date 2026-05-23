@@ -98,17 +98,17 @@ export function SplashScreen() {
           exit={{ opacity: 0, scale: 1.05 }}
           transition={{ duration: 0.8, ease: [0.25, 0.46, 0.45, 0.94] }}
           className="fixed inset-0 z-[100] flex flex-col items-center justify-center overflow-hidden"
-          style={{ background: '#0A0A0F' }}
+          style={{ background: '#FFE9F2' }}
         >
           {/* === LAYER 1: Deep Gradient Mesh Background === */}
           <div className="absolute inset-0">
             {/* Primary deep gradient */}
             <div className="absolute inset-0" style={{
               background: `
-                radial-gradient(ellipse 80% 60% at 50% 50%, rgba(30,27,75,0.9) 0%, transparent 70%),
-                radial-gradient(ellipse 60% 80% at 20% 80%, rgba(223,0,89,0.15) 0%, transparent 50%),
-                radial-gradient(ellipse 60% 80% at 80% 20%, rgba(224,110,156,0.12) 0%, transparent 50%),
-                linear-gradient(180deg, #0A0A0F 0%, #1E1B4B 50%, #0A0A0F 100%)
+                radial-gradient(ellipse 80% 55% at 50% 38%, rgba(255,255,255,0.92) 0%, rgba(255,233,242,0.72) 48%, transparent 72%),
+                radial-gradient(ellipse 55% 70% at 18% 78%, rgba(223,0,89,0.24) 0%, transparent 54%),
+                radial-gradient(ellipse 55% 70% at 85% 18%, rgba(224,110,156,0.32) 0%, transparent 56%),
+                linear-gradient(180deg, #FFFFFF 0%, #FFE9F2 46%, #F5CFDE 100%)
               `
             }} />
           </div>
@@ -117,10 +117,10 @@ export function SplashScreen() {
           <motion.div
             animate={{
               background: [
-                'radial-gradient(ellipse 100% 40% at 30% 50%, rgba(223,0,89,0.12) 0%, transparent 70%)',
-                'radial-gradient(ellipse 100% 40% at 70% 50%, rgba(224,110,156,0.12) 0%, transparent 70%)',
-                'radial-gradient(ellipse 100% 40% at 50% 50%, rgba(255,193,7,0.10) 0%, transparent 70%)',
-                'radial-gradient(ellipse 100% 40% at 30% 50%, rgba(223,0,89,0.12) 0%, transparent 70%)',
+                'radial-gradient(ellipse 100% 42% at 30% 50%, rgba(223,0,89,0.16) 0%, transparent 70%)',
+                'radial-gradient(ellipse 100% 42% at 70% 50%, rgba(224,110,156,0.20) 0%, transparent 70%)',
+                'radial-gradient(ellipse 100% 42% at 50% 50%, rgba(255,193,7,0.16) 0%, transparent 70%)',
+                'radial-gradient(ellipse 100% 42% at 30% 50%, rgba(223,0,89,0.16) 0%, transparent 70%)',
               ]
             }}
             transition={{ duration: 8, repeat: Infinity, ease: "easeInOut" }}
@@ -135,9 +135,9 @@ export function SplashScreen() {
               scale: [1, 1.2, 0.9, 1.1, 1],
             }}
             transition={{ duration: 12, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute top-1/4 -left-20 w-80 h-80 rounded-full opacity-30"
+            className="absolute top-1/4 -left-20 w-80 h-80 rounded-full opacity-50"
             style={{
-              background: 'radial-gradient(circle, rgba(223,0,89,0.4) 0%, rgba(223,0,89,0.1) 40%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(223,0,89,0.42) 0%, rgba(223,0,89,0.16) 42%, transparent 72%)',
               filter: 'blur(60px)',
             }}
           />
@@ -148,27 +148,27 @@ export function SplashScreen() {
               scale: [1, 0.9, 1.15, 0.95, 1],
             }}
             transition={{ duration: 10, repeat: Infinity, ease: "easeInOut" }}
-            className="absolute bottom-1/4 -right-20 w-72 h-72 rounded-full opacity-25"
+            className="absolute bottom-1/4 -right-20 w-72 h-72 rounded-full opacity-45"
             style={{
-              background: 'radial-gradient(circle, rgba(224,110,156,0.4) 0%, rgba(224,110,156,0.1) 40%, transparent 70%)',
+              background: 'radial-gradient(circle, rgba(224,110,156,0.42) 0%, rgba(224,110,156,0.14) 42%, transparent 72%)',
               filter: 'blur(50px)',
             }}
           />
           <motion.div
             animate={{
               scale: [1, 1.3, 1, 1.2, 1],
-              opacity: [0.15, 0.25, 0.15, 0.2, 0.15],
+              opacity: [0.18, 0.32, 0.18, 0.24, 0.18],
             }}
             transition={{ duration: 7, repeat: Infinity, ease: "easeInOut" }}
             className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 rounded-full"
             style={{
-              background: 'radial-gradient(circle, rgba(255,193,7,0.15) 0%, transparent 60%)',
+              background: 'radial-gradient(circle, rgba(255,193,7,0.20) 0%, transparent 60%)',
               filter: 'blur(80px)',
             }}
           />
 
           {/* === LAYER 4: Neural Network Lines === */}
-          <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.4 }}>
+          <svg className="absolute inset-0 w-full h-full" style={{ opacity: 0.22 }}>
             <defs>
               <linearGradient id="neural-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="rgba(223,0,89,0.6)" />
@@ -190,11 +190,11 @@ export function SplashScreen() {
 
           {/* === LAYER 6: Grid Overlay (subtle fintech dashboard feel) === */}
           <div
-            className="absolute inset-0 opacity-[0.03]"
+            className="absolute inset-0 opacity-[0.055]"
             style={{
               backgroundImage: `
-                linear-gradient(rgba(223,0,89,0.3) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(223,0,89,0.3) 1px, transparent 1px)
+                linear-gradient(rgba(204,13,90,0.22) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(204,13,90,0.22) 1px, transparent 1px)
               `,
               backgroundSize: '60px 60px',
             }}
@@ -219,7 +219,7 @@ export function SplashScreen() {
                 transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
                 className="absolute -inset-4 rounded-[32px]"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(223,0,89,0.3), rgba(224,110,156,0.2), rgba(255,193,7,0.15))',
+                  background: 'linear-gradient(135deg, rgba(223,0,89,0.34), rgba(224,110,156,0.24), rgba(255,193,7,0.18))',
                   filter: 'blur(20px)',
                 }}
               />
@@ -233,7 +233,7 @@ export function SplashScreen() {
                 transition={{ duration: 2.5, repeat: Infinity, ease: "easeInOut", delay: 0.5 }}
                 className="absolute -inset-8 rounded-[40px]"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(223,0,89,0.15), transparent, rgba(224,110,156,0.1))',
+                  background: 'linear-gradient(135deg, rgba(223,0,89,0.18), transparent, rgba(224,110,156,0.14))',
                   filter: 'blur(30px)',
                 }}
               />
@@ -241,14 +241,14 @@ export function SplashScreen() {
               {/* Glass card container */}
               <div className="relative w-28 h-28 rounded-[28px] overflow-hidden"
                 style={{
-                  background: 'linear-gradient(135deg, rgba(255,255,255,0.08) 0%, rgba(255,255,255,0.02) 100%)',
+                  background: 'linear-gradient(135deg, #DF0059 0%, #CC0D5A 62%, #221F20 100%)',
                   backdropFilter: 'blur(20px)',
                   WebkitBackdropFilter: 'blur(20px)',
                   boxShadow: `
-                    0 0 0 1px rgba(223,0,89,0.2),
-                    0 0 30px rgba(223,0,89,0.1),
-                    0 20px 60px rgba(0,0,0,0.4),
-                    inset 0 1px 0 rgba(255,255,255,0.1)
+                    0 0 0 1px rgba(255,255,255,0.5),
+                    0 0 36px rgba(223,0,89,0.20),
+                    0 24px 60px rgba(204,13,90,0.22),
+                    inset 0 1px 0 rgba(255,255,255,0.22)
                   `,
                 }}
               >
@@ -258,7 +258,7 @@ export function SplashScreen() {
                   transition={{ duration: 8, repeat: Infinity, ease: "linear" }}
                   className="absolute -inset-[1px] rounded-[28px]"
                   style={{
-                    background: 'conic-gradient(from 0deg, rgba(223,0,89,0.4), transparent, rgba(224,110,156,0.3), transparent, rgba(255,193,7,0.2), transparent, rgba(223,0,89,0.4))',
+                    background: 'conic-gradient(from 0deg, rgba(255,255,255,0.78), transparent, rgba(255,193,7,0.38), transparent, rgba(255,255,255,0.62), transparent, rgba(255,255,255,0.78))',
                     mask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                     maskComposite: 'exclude',
                     WebkitMaskComposite: 'xor',
@@ -281,7 +281,7 @@ export function SplashScreen() {
                 <div
                   className="absolute inset-0 pointer-events-none"
                   style={{
-                    background: 'linear-gradient(135deg, rgba(255,255,255,0.1) 0%, transparent 50%)',
+                    background: 'linear-gradient(135deg, rgba(255,255,255,0.22) 0%, transparent 50%)',
                   }}
                 />
               </div>
@@ -297,15 +297,15 @@ export function SplashScreen() {
               <h1
                 className="text-4xl font-black tracking-tight mb-2"
                 style={{
-                  background: 'linear-gradient(135deg, #FFFFFF 0%, rgba(255,255,255,0.85) 50%, rgba(223,0,89,0.6) 100%)',
+                  background: 'linear-gradient(135deg, #DF0059 0%, #CC0D5A 52%, #221F20 100%)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent',
                   backgroundClip: 'text',
                   textShadow: 'none',
-                  filter: 'drop-shadow(0 0 20px rgba(223,0,89,0.2))',
+                  filter: 'drop-shadow(0 12px 30px rgba(223,0,89,0.22))',
                 }}
               >
-                BeU NextGen
+                NextGen
               </h1>
 
               {/* Subtitle: AGENT */}
@@ -313,9 +313,9 @@ export function SplashScreen() {
                 initial={{ opacity: 0, letterSpacing: '0.1em' }}
                 animate={phase >= 2 ? { opacity: 1, letterSpacing: '0.35em' } : {}}
                 transition={{ duration: 1.2, ease: "easeOut", delay: 0.2 }}
-                className="text-[11px] font-semibold uppercase text-white/40"
+                className="text-[11px] font-semibold uppercase text-[#CC0D5A]/70"
               >
-                Money Mood OS
+                TEAM ITC
               </motion.p>
             </motion.div>
 
@@ -324,7 +324,7 @@ export function SplashScreen() {
               initial={{ opacity: 0 }}
               animate={phase >= 3 ? { opacity: 1 } : {}}
               transition={{ duration: 1, delay: 0.3 }}
-              className="mt-6 text-[10px] text-white/25 font-medium tracking-wider text-center max-w-[200px]"
+              className="mt-6 text-[10px] text-[#727272] font-semibold tracking-wider text-center max-w-[220px]"
             >
               AI-powered financial companion for youth money habits
             </motion.p>
@@ -338,7 +338,7 @@ export function SplashScreen() {
             className="absolute bottom-16 flex flex-col items-center gap-4"
           >
             {/* Thin gradient progress line */}
-            <div className="w-32 h-[2px] rounded-full overflow-hidden bg-white/5">
+            <div className="w-32 h-[2px] rounded-full overflow-hidden bg-[#DF0059]/10">
               <motion.div
                 initial={{ x: '-100%' }}
                 animate={{ x: '100%' }}
@@ -349,7 +349,7 @@ export function SplashScreen() {
                 }}
                 className="w-full h-full"
                 style={{
-                  background: 'linear-gradient(90deg, transparent, rgba(223,0,89,0.8), rgba(224,110,156,0.6), transparent)',
+                  background: 'linear-gradient(90deg, transparent, rgba(223,0,89,0.95), rgba(224,110,156,0.72), transparent)',
                 }}
               />
             </div>
@@ -387,7 +387,7 @@ export function SplashScreen() {
             transition={{ duration: 1, delay: 0.5 }}
             className="absolute bottom-6 text-center"
           >
-            <p className="text-[9px] text-white/15 font-medium tracking-widest uppercase">
+            <p className="text-[9px] text-[#CC0D5A]/45 font-semibold tracking-widest uppercase">
               BeU Pulse UI
             </p>
           </motion.div>
