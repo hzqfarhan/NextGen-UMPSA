@@ -55,7 +55,7 @@ BeU NextGen separates money into **what the user has**, **what must be protected
 | Charts | Recharts |
 | Icons | Lucide React |
 | AI Model | Google Gemini 3.1 Flash Lite |
-| Database | PostgreSQL (Neon Cloud) |
+| Database | PostgreSQL (IPONESERVER — NovaCloud) |
 
 ---
 
@@ -71,7 +71,7 @@ Browser (PWA)
        └─ StoreSyncHandler → syncs to PostgreSQL on state change
             └─ Next.js API Routes (/api/chat, /api/user, /api/savings, /api/transfers, /api/bills)
                  ├─ Google Gemini AI (structured JSON responses, function calling)
-                 └─ PostgreSQL Database (users, savings, transfers, bills, chat_logs)
+                 └─ PostgreSQL Database — hosted on IPONESERVER (NovaCloud)
 ```
 
 ### Pages
@@ -105,7 +105,7 @@ Open `http://localhost:2221`.
 # Required for AI coaching
 GEMINI_API_KEY=your_key_here
 
-# Required for persistent database
+# Required for persistent database (hosted on IPONESERVER — NovaCloud)
 DATABASE_URL=postgresql://user:pass@host:5432/dbname
 
 # Optional

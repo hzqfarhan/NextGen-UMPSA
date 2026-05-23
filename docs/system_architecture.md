@@ -17,7 +17,7 @@
 | State Management | Zustand | Global financial state, user wallet, session |
 | Charts | Recharts | Spending insights and score visualizations |
 | AI Model | Google Gemini 3.1 Flash Lite | Multi-agent financial coaching (via REST API) |
-| Database | PostgreSQL (Neon/cloud) | Persistent user, savings, transfers, bills records |
+| Database | PostgreSQL (IPONESERVER — NovaCloud) | Persistent user, savings, transfers, bills records |
 | Icons | Lucide React | Interface iconography |
 
 ---
@@ -58,8 +58,8 @@
                │                            │
     ┌──────────▼──────────┐      ┌──────────▼──────────┐
     │   Google Gemini AI  │      │  PostgreSQL Database │
-    │  (REST API, Flash)  │      │  (Neon Cloud)        │
-    │                     │      │                      │
+    │  (REST API, Flash)  │      │  IPONESERVER         │
+    │                     │      │  (NovaCloud)         │
     │  4 Agent Personas:  │      │  Tables:             │
     │  • Finance Strategist│      │  • users             │
     │  • Savings Sentinel │      │  • savings           │
