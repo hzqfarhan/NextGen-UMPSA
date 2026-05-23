@@ -54,7 +54,7 @@ BeU NextGen separates money into **what the user has**, **what must be protected
 | State | Zustand |
 | Charts | Recharts |
 | Icons | Lucide React |
-| AI Model | Google Gemini 2.5 Flash |
+| AI Model | Google Gemini 3.1 Flash Lite |
 | Database | PostgreSQL (Neon Cloud) |
 
 ---
@@ -109,7 +109,7 @@ GEMINI_API_KEY=your_key_here
 DATABASE_URL=postgresql://user:pass@host:5432/dbname
 
 # Optional
-GEMINI_MODEL=gemini-2.5-flash
+GEMINI_MODEL=gemini-3.1-flash-lite
 NEXT_PUBLIC_BASE_PATH=
 ```
 
@@ -148,7 +148,7 @@ See `/docs/system_architecture.md` for full schema.
 
 | Tool | Usage |
 |---|---|
-| **Google Gemini 2.5 Flash** | All AI coaching, structured JSON financial responses, function calling (createSavingsPocket, addFundsToPocket, toggleSpendGuard) |
+| **Google Gemini 3.1 Flash Lite** | All AI coaching, structured JSON financial responses, function calling (createSavingsPocket, addFundsToPocket, toggleSpendGuard) |
 | **Antigravity** | System architecture, component implementation, database schema, API routes, agent routing logic |
 
 > All AI-generated code has been reviewed, tested, and understood by the team. We can walk through any part during Q&A.
