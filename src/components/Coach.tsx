@@ -679,17 +679,12 @@ export function Coach() {
 
   return (
     <div className="fixed inset-0 flex flex-col max-w-lg mx-auto overflow-hidden bg-black z-50">
-      <video 
-        autoPlay 
-        loop 
-        muted 
-        playsInline 
-        preload="auto"
-        disablePictureInPicture
+      <img
+        src={`${basePath}/assets/bot.gif`}
+        alt=""
+        aria-hidden="true"
         className="absolute inset-0 w-full h-full object-cover z-0 opacity-60 pointer-events-none"
-      >
-        <source src={`${basePath}/assets/IMG_2531.MP4`} type="video/mp4" />
-      </video>
+      />
       {/* Top Header */}
       <header className="p-4 bg-black/40 backdrop-blur-xl border-b border-white/10 shadow-sm z-20 shrink-0">
         <div className="flex justify-between items-center">
