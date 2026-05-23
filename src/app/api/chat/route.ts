@@ -119,7 +119,7 @@ export async function POST(req: NextRequest) {
             const parts: string[] = [];
             if (context.balance !== undefined) parts.push(`Current balance: RM ${context.balance.toFixed(2)}`);
             if (context.safeDailySpend !== undefined) parts.push(`Safe daily spend: RM ${context.safeDailySpend.toFixed(2)}`);
-            if (context.resilienceScore !== undefined) parts.push(`Resilience Score: ${context.resilienceScore}%`);
+            if (context.nextGenScore !== undefined) parts.push(`NextGen Score: ${context.nextGenScore}%`);
             if (context.savingsPockets?.length) {
                 const pocketList = context.savingsPockets.map((p: any) => `${p.name} (RM ${p.current}/${p.target})`).join(', ');
                 parts.push(`Active savings pockets: ${pocketList}`);

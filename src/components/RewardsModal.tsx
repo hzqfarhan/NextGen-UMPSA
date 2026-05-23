@@ -8,6 +8,7 @@ import { X, Gift, Lock, Unlock, Ticket, Award, Calendar, Coffee, Coins, Check, H
 import { useStore } from "@/store/useStore"
 import { t } from "@/lib/translations"
 import { cn } from "@/lib/utils"
+import { Progress } from "@/components/ui/progress"
 
 interface RewardsModalProps {
   isOpen: boolean
@@ -25,7 +26,8 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
     moveFundsToAwfarNest,
     triggerBimbMigration,
     activateStreakShield,
-    language
+    language,
+    transactions
   } = useStore()
 
   const [activeTab, setActiveTab] = useState<'tiers' | 'awfar' | 'maxcash' | 'migration'>('tiers')
@@ -35,6 +37,11 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
   const [nestedError, setNestedError] = useState<string>("")
 
   const strings = t[language]
+
+  const todayStr = new Date().toDateString();
+  const todaySavings = transactions
+    .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
+    .reduce((sum, t) => sum + t.amount, 0);
 
   // Handlers
   const handleAwfarDeposit = () => {
@@ -62,9 +69,9 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
         'Baseline conversational access to 4 specialized AI Council Agents.',
         'Standard financial diagnostics and roasts.'
       ],
-      color: 'from-rose-500 to-pink-500',
-      textColor: 'text-rose-500',
-      bg: 'bg-rose-500/10',
+      color: 'from-[#DF0059] to-[#CC0D5A]',
+      textColor: 'text-[#DF0059]',
+      bg: 'bg-[#FFE9F2]',
       active: true // default
     },
     {
@@ -77,9 +84,9 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
         'Unlocks GrabFood RM5 OFF coupon code (BIMBYOUTH5).',
         'Unlocks Koppiku 10% OFF beverage coupon code (KOPIBEU10).'
       ],
-      color: 'from-slate-400 to-slate-600',
-      textColor: 'text-slate-600',
-      bg: 'bg-slate-500/10',
+      color: 'from-[#237AF9] to-[#1C62C7]',
+      textColor: 'text-[#237AF9]',
+      bg: 'bg-[#E9F2FE]',
       active: currentStreak >= 7
     },
     {
@@ -91,9 +98,9 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
         'Boosts simulated Growth Starter pocket profit yield rate modifier by +0.5% p.a. (from 6.5% to 7.0% p.a.).',
         'Double entries multiplier into monthly simulated prize raffles.'
       ],
-      color: 'from-amber-500 to-yellow-500',
-      textColor: 'text-amber-600',
-      bg: 'bg-amber-500/10',
+      color: 'from-[#FFC107] to-[#CBA024]',
+      textColor: 'text-[#CBA024]',
+      bg: 'bg-[#FFFAEA]',
       active: currentStreak >= 30
     }
   ]
@@ -156,15 +163,15 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                 </div>
 
                 {/* Quick Info bar */}
-                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex justify-between items-center text-xs">
-                  <div>
-                    <span className="text-slate-400 font-medium">Current Streak:</span>
-                    <span className="font-extrabold text-black ml-1">🔥 {currentStreak} Days</span>
+                <div className="bg-slate-50 border border-slate-100 rounded-xl p-3 flex items-center justify-between gap-1 text-[11px] w-full overflow-hidden">
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-slate-400 font-medium">Streak:</span>
+                    <span className="font-extrabold text-black ml-0.5">🔥 {currentStreak} Days</span>
                   </div>
-                  <div>
-                    <span className="text-slate-400 font-medium">Your Tier:</span>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <span className="text-slate-400 font-medium font-bold">Tier:</span>
                     <Badge className={cn(
-                      "ml-1 font-bold text-[9px] px-2 py-0.5 rounded-lg border",
+                      "ml-0.5 font-bold text-[9px] px-1.5 py-0.5 rounded-lg border shrink-0",
                       membershipTier === 'Gold' ? "bg-purple-100 text-purple-700 border-purple-200" :
                       membershipTier === 'Silver' ? "bg-blue-100 text-blue-700 border-blue-200" :
                       "bg-orange-100 text-orange-700 border-orange-200"
@@ -172,10 +179,45 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                       {membershipTier === 'Gold' ? 'Legend' : membershipTier === 'Silver' ? 'Pro' : 'Novice'}
                     </Badge>
                   </div>
+                  {streakShieldActive && (
+                    <Badge variant="secondary" className="bg-blue-100 text-blue-700 border border-blue-200 flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5 animate-pulse shrink-0">
+                      🛡️ Shield Active
+                    </Badge>
+                  )}
+                </div>
+
+                {/* Today's Saving Quota Progress Bar */}
+                <div className="space-y-1.5 p-3 rounded-2xl bg-[#FFF7FA] border border-pink-100 shadow-inner w-full">
+                  <div className="flex justify-between items-center text-[10px]">
+                    <span className="text-slate-600 font-extrabold flex items-center gap-1.5">
+                      🎯 {language === 'en' ? "Today's Savings Progress" : "Kemajuan Simpanan Hari Ini"}
+                    </span>
+                    <span className={cn(
+                      "font-black text-xs",
+                      todaySavings >= 5.0 ? "text-emerald-600" : "text-[#DF0059]"
+                    )}>
+                      RM {todaySavings.toFixed(2)} / RM 5.00
+                    </span>
+                  </div>
+                  <Progress 
+                    value={Math.min(100, (todaySavings / 5.0) * 100)} 
+                    className={cn(
+                      "h-2 transition-all duration-500",
+                      todaySavings >= 5.0 
+                        ? "[&_[data-slot=progress-indicator]]:bg-emerald-500 bg-emerald-100" 
+                        : "[&_[data-slot=progress-indicator]]:bg-[#DF0059] bg-pink-100"
+                    )}
+                  />
+                  <p className="text-[8.5px] text-slate-500 font-bold text-center mt-1">
+                    {todaySavings >= 5.0 
+                      ? (language === 'en' ? "✨ Daily quota met! Tap 'Simulate Next Day' on the dashboard to grow your streak!" : "✨ Kuota harian dipenuhi! Ketik 'Simulasi Hari Seterusnya' di papan pemuka untuk tambahkan streak!")
+                      : (language === 'en' ? "💡 Save RM 5.00 or more today to grow your streak tomorrow!" : "💡 Simpan RM 5.00 atau lebih hari ini untuk tingkatkan streak esok!")
+                    }
+                  </p>
                 </div>
 
                 {/* Tabs */}
-                <div className="flex bg-slate-100 p-1 rounded-xl gap-1">
+                <div className="flex bg-[#F8F8F8] border border-[#F1F1F1] p-1 rounded-xl gap-1">
                   {[
                     { id: 'tiers', label: 'Tiers' },
                     { id: 'awfar', label: 'Awfar Nest' },
@@ -191,8 +233,8 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                       }}
                       className={`flex-1 text-[10px] font-bold py-2 rounded-lg transition-all ${
                         activeTab === tab.id
-                          ? 'bg-white text-slate-900 shadow-sm'
-                          : 'text-slate-500 hover:text-slate-700'
+                          ? 'bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] text-white shadow-sm shadow-[#DF0059]/20'
+                          : 'text-[#727272] hover:text-[#DF0059] hover:bg-[#FFE9F2]/50'
                       }`}
                     >
                       {tab.label}
@@ -211,37 +253,37 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                             key={t.id}
                             className={`p-3.5 rounded-xl border transition-all ${
                               isCurrent
-                                ? 'bg-white border-primary shadow-md ring-2 ring-primary/10'
+                                ? 'bg-[#FCF0F1] border-[#DF0059]/30 shadow-md ring-2 ring-[#DF0059]/10'
                                 : t.active
-                                ? 'bg-white border-slate-200'
-                                : 'bg-slate-50/50 border-slate-200 opacity-60'
+                                ? 'bg-white border-[#F1F1F1]'
+                                : 'bg-[#F8F8F8] border-[#F1F1F1] opacity-60'
                             }`}
                           >
                             <div className="flex justify-between items-start mb-2">
                               <div>
                                 <div className="flex items-center gap-2">
-                                  <h4 className="font-extrabold text-sm text-black">{t.name}</h4>
+                                  <h4 className="font-extrabold text-sm text-[#221F20]">{t.name}</h4>
                                   {isCurrent && (
-                                    <Badge className="bg-emerald-500 text-white font-bold text-[8px] h-fit">
+                                    <Badge className="bg-[#DF0059] text-white font-bold text-[8px] h-fit border-none shadow-sm">
                                       Active
                                     </Badge>
                                   )}
                                 </div>
-                                <p className="text-[10px] text-muted-foreground font-medium">{t.milestone}</p>
+                                <p className="text-[10px] text-[#727272] font-medium">{t.milestone}</p>
                               </div>
                               <div className={`p-1.5 rounded-lg ${t.bg}`}>
                                 {t.active ? (
                                   <Unlock className={`w-3.5 h-3.5 ${t.textColor}`} />
                                 ) : (
-                                  <Lock className="w-3.5 h-3.5 text-slate-400" />
+                                  <Lock className="w-3.5 h-3.5 text-[#B2B2B2]" />
                                 )}
                               </div>
                             </div>
 
                             <ul className="space-y-1.5 pl-1">
                               {t.perks.map((perk, idx) => (
-                                <li key={idx} className="text-[10px] text-slate-600 flex items-start gap-1.5">
-                                  <Check className="w-3 h-3 text-emerald-500 shrink-0 mt-0.5" />
+                                <li key={idx} className="text-[10px] text-[#555555] flex items-start gap-1.5">
+                                  <Check className="w-3 h-3 text-[#49B9B3] shrink-0 mt-0.5" />
                                   <span>{perk}</span>
                                 </li>
                               ))}

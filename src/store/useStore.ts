@@ -149,7 +149,7 @@ export interface Bill {
   updatedAt?: string;
 }
 
-interface ResilienceState {
+interface NextGenState {
   language: Language;
   user: {
     name: string;
@@ -177,10 +177,10 @@ interface ResilienceState {
   transactions: Transaction[];
   savingsPockets: SavingsPocket[];
   agents: Agent[];
-  resilienceScore: number;
-  resilienceCashflowScore: number;
-  resilienceSavingsScore: number;
-  resilienceDebtScore: number;
+  nextGenScore: number;
+  nextGenCashflowScore: number;
+  nextGenSavingsScore: number;
+  nextGenDebtScore: number;
   debtRiskScore: number;
   cashflowRisk: 'low' | 'medium' | 'high';
   safeDailySpend: number;
@@ -232,7 +232,7 @@ interface ResilienceState {
   processAutoSave: () => void;
   processRoundUp: (amount: number) => void;
   simulateGrowth: () => void;
-  updateResilienceScore: () => void;
+  updateNextGenScore: () => void;
   setLanguage: (lang: Language) => void;
   
   // Gamification Actions
@@ -351,10 +351,10 @@ export const initialStoreState = {
     { id: 'cash', name: 'Cashflow Prediction Agent', status: 'alert' as const, latestFinding: 'Predicted broke date: 18 May', confidence: 0.87, recommendedAction: 'Activate Impulse Guard', tools: ['predict_cashflow', 'calculate_safe_daily_spend'] },
     { id: 'debt', name: 'Commitment Shield Agent', status: 'idle' as const, latestFinding: 'No new debt detected.', confidence: 0.95, recommendedAction: 'Continue monitoring', tools: ['scan_bnpl', 'check_installments'] },
   ],
-  resilienceScore: 68,
-  resilienceCashflowScore: 65,
-  resilienceSavingsScore: 40,
-  resilienceDebtScore: 95,
+  nextGenScore: 68,
+  nextGenCashflowScore: 65,
+  nextGenSavingsScore: 40,
+  nextGenDebtScore: 95,
   debtRiskScore: 45,
   cashflowRisk: 'medium' as const,
   safeDailySpend: 18.5,
@@ -400,7 +400,7 @@ export const initialStoreState = {
 };
 
 // Persisted Zustand store using localStorage
-const useStoreBase = create<ResilienceState>()(
+const useStoreBase = create<NextGenState>()(
   persist(
     (set, get) => ({
       ...initialStoreState,
@@ -425,7 +425,7 @@ const useStoreBase = create<ResilienceState>()(
         if (!skipRoundUp && t.type === 'expense') {
           get().processRoundUp(t.amount);
         }
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       addSavingsPocket: (p) => {
         const state = get();
@@ -463,7 +463,7 @@ const useStoreBase = create<ResilienceState>()(
             initialSafeDaily: nextSafeDaily
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       updateSavingsPocket: (id, updates) => {
         set((state) => {
@@ -476,7 +476,7 @@ const useStoreBase = create<ResilienceState>()(
             )
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       deleteSavingsPocket: (id) => {
         const state = get();
@@ -509,7 +509,7 @@ const useStoreBase = create<ResilienceState>()(
             initialSafeDaily: nextSafeDaily
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       addFundsToPocket: (id, amount) => {
         const state = get();
@@ -535,6 +535,19 @@ const useStoreBase = create<ResilienceState>()(
             confidence: 1.0
           };
 
+          const todayStr = new Date().toDateString();
+          const preSavingTx = state.transactions
+            .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
+            .reduce((sum, t) => sum + t.amount, 0);
+          const totalSavedToday = preSavingTx + amount;
+
+          const isFirstTimeMeetingQuota = totalSavedToday >= 5.0 && preSavingTx < 5.0;
+          const petMessage = isFirstTimeMeetingQuota
+            ? `Awesome save! You've met today's savings quota of RM 5.00 and protected your streak! 🔥`
+            : `Nice save! Moving RM ${amount.toFixed(2)} to ${pocketName}. Your daily quota remains stable for today, and your NextGen Score is fully protected!`;
+
+          const petAnimation = isFirstTimeMeetingQuota ? "excited" : "happy";
+
           return {
             savingsPockets: nextPockets,
             transactions: [newTx, ...state.transactions],
@@ -542,11 +555,12 @@ const useStoreBase = create<ResilienceState>()(
             safeDailySpend: safeDailyAfter,
             initialSafeDaily: safeDailyAfter,
             pet: {
-              message: `Nice save! Moving RM ${amount.toFixed(2)} to ${pocketName}. Your daily quota remains stable for today, and your Resilience Score is fully protected!`
+              message: petMessage,
+              animation: petAnimation
             }
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       calculateDailyLimitForBalance: (balance) => {
         const state = get();
@@ -632,7 +646,7 @@ const useStoreBase = create<ResilienceState>()(
           safeDailySpend: flooredDaily > 0 ? flooredDaily : 10.0,
         }));
         
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       toggleSpendGuard: () => set((state) => ({ isSpendGuardActive: !state.isSpendGuardActive })),
       toggleSurvivalMode: () => set((state) => ({ isSurvivalModeActive: !state.isSurvivalModeActive })),
@@ -813,35 +827,34 @@ const useStoreBase = create<ResilienceState>()(
           }
         }));
 
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       simulateNextDay: () => {
         const state = get();
         const todayStr = new Date().toDateString();
         
-        const todayExpenses = state.transactions
-          .filter(t => t.type === 'expense' && new Date(t.date).toDateString() === todayStr)
+        const todaySavings = state.transactions
+          .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
           .reduce((sum, t) => sum + t.amount, 0);
           
-        const limit = state.safeDailySpend;
         let streakUpdated = state.currentStreak;
         let shieldActive = state.streakShieldActive;
         let petAnimation = 'idle';
         let petMessage = '';
 
-        if (todayExpenses <= limit) {
+        if (todaySavings >= 5.0) {
           streakUpdated += 1;
           petAnimation = 'excited';
-          petMessage = `Awesome! You stayed under your Safe Daily Spend limit. Your saving streak is now ${streakUpdated} days! 🔥`;
+          petMessage = `Awesome! You successfully saved RM ${todaySavings.toFixed(2)} today (met the RM 5.00 daily quota). Your saving streak is now ${streakUpdated} days! 🔥`;
         } else {
           if (shieldActive) {
             shieldActive = false;
             petAnimation = 'think';
-            petMessage = `You overspent today, but your Streak Shield protected your streak of ${streakUpdated} days! 🛡️`;
+            petMessage = `You saved only RM ${todaySavings.toFixed(2)} today (missed the RM 5.00 quota), but your Streak Shield protected your streak of ${streakUpdated} days! 🛡️`;
           } else {
             streakUpdated = 0;
             petAnimation = 'sad';
-            petMessage = `Oh no! You overspent today (spent RM ${todayExpenses.toFixed(2)} vs limit RM ${limit.toFixed(2)}). Your streak has reset to 0. 😿`;
+            petMessage = `Oh no! You saved only RM ${todaySavings.toFixed(2)} today, missing the RM 5.00 daily quota. Your streak has reset to 0. 😿`;
           }
         }
 
@@ -877,17 +890,18 @@ const useStoreBase = create<ResilienceState>()(
           streakShieldActive: shieldActive,
           membershipTier: tier,
           transactions: shiftedTransactions,
-          lastCalculatedDate: todayStr,
+          lastCalculatedDate: '',
+          lastQuotaUpdateDate: '',
           pet: {
             message: petMessage,
             animation: petAnimation
           }
         }));
 
-        get().updateResilienceScore();
+        get().updateNextGenScore();
         get().checkAndRefreshDailyQuota();
       },
-      updateResilienceScore: () => {
+      updateNextGenScore: () => {
         set((state) => {
           // 1. Cashflow Safety (50% Weight)
           // Compare Actual Daily Spending vs. Safe Daily Spend Quota. If Actual > Safe, the score drops.
@@ -916,14 +930,14 @@ const useStoreBase = create<ResilienceState>()(
             ? Math.max(0, Math.min(100, (1 - (commitments / totalBalance)) * 100)) 
             : 100;
 
-          // Total Resilience Score weighted calculation
+          // Total NextGen Score weighted calculation
           const finalScore = Math.round((0.5 * cashflowScore) + (0.3 * debtScore) + (0.2 * savingsScore));
           
           return {
-            resilienceScore: finalScore,
-            resilienceCashflowScore: Math.round(cashflowScore),
-            resilienceSavingsScore: Math.round(savingsScore),
-            resilienceDebtScore: Math.round(debtScore)
+            nextGenScore: finalScore,
+            nextGenCashflowScore: Math.round(cashflowScore),
+            nextGenSavingsScore: Math.round(savingsScore),
+            nextGenDebtScore: Math.round(debtScore)
           };
         });
       },
@@ -939,7 +953,7 @@ const useStoreBase = create<ResilienceState>()(
             user: { ...state.user, totalCommitments }
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       updateBill: (id, updates) => {
         set((state) => {
@@ -950,7 +964,7 @@ const useStoreBase = create<ResilienceState>()(
             user: { ...state.user, totalCommitments }
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       deleteBill: (id) => {
         set((state) => {
@@ -961,19 +975,19 @@ const useStoreBase = create<ResilienceState>()(
             user: { ...state.user, totalCommitments }
           };
         });
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       toggleBillLock: (id) => {
         set((state) => ({
           bills: state.bills.map(b => b.id === id ? { ...b, isLocked: !b.isLocked } : b)
         }));
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       toggleBillAutopay: (id) => {
         set((state) => ({
           bills: state.bills.map(b => b.id === id ? { ...b, autopayEnabled: !b.autopayEnabled } : b)
         }));
-        get().updateResilienceScore();
+        get().updateNextGenScore();
       },
       payBillNow: (id) => {
         const state = get();
@@ -1098,8 +1112,8 @@ const useStoreBase = create<ResilienceState>()(
 );
 
 interface UseStoreHook {
-  (): ResilienceState;
-  <T>(selector: (state: ResilienceState) => T): T;
+  (): NextGenState;
+  <T>(selector: (state: NextGenState) => T): T;
   getState: typeof useStoreBase.getState;
   setState: typeof useStoreBase.setState;
   subscribe: typeof useStoreBase.subscribe;
@@ -1107,7 +1121,7 @@ interface UseStoreHook {
 
 // Safe Hydration Selector Hook wrapper with static Zustand bindings
 export const useStore = (() => {
-  const hook = <T>(selector?: (state: ResilienceState) => T): T | ResilienceState => {
+  const hook = <T>(selector?: (state: NextGenState) => T): T | NextGenState => {
     const storeState = useStoreBase();
     const [hydrated, setHydrated] = useState(false);
 
@@ -1129,7 +1143,7 @@ export const useStore = (() => {
       processAutoSave: storeState.processAutoSave,
       processRoundUp: storeState.processRoundUp,
       simulateGrowth: storeState.simulateGrowth,
-      updateResilienceScore: storeState.updateResilienceScore,
+      updateNextGenScore: storeState.updateNextGenScore,
       setLanguage: storeState.setLanguage,
       addBill: storeState.addBill,
       updateBill: storeState.updateBill,
@@ -1153,7 +1167,7 @@ export const useStore = (() => {
       : { ...initialStoreState, ...actions };
 
     // Apply selector if provided, otherwise cast whole state
-    return selector ? selector(stateToUse as ResilienceState) : (stateToUse as ResilienceState);
+    return selector ? selector(stateToUse as NextGenState) : (stateToUse as NextGenState);
   };
 
   hook.getState = useStoreBase.getState;

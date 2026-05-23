@@ -19,7 +19,7 @@ The entire streak system is built inside a unified, persisted store using **Zust
 
 ### 1. State Variables
 ```typescript
-interface ResilienceState {
+interface NextGenState {
   currentStreak: number;          // Current consecutive days within budget
   highestStreak: number;          // Historical record high streak
   membershipTier: 'Bronze' | 'Silver' | 'Gold'; // Dynamically updated tier

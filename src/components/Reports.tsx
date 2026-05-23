@@ -37,7 +37,7 @@ const marketData = [
 ]
 
 export function Insights() {
-  const { resilienceScore, language, debtRiskScore, savingsPockets } = useStore()
+  const { nextGenScore, language, debtRiskScore, savingsPockets } = useStore()
   const bills = useStore(state => state.bills)
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -56,23 +56,23 @@ export function Insights() {
     return fallback
   })
 
-  // 2. Dynamic Debt Health based on Dashboard Resilience Score
-  let resilienceRating = "At Risk"
-  if (resilienceScore >= 75) {
-    resilienceRating = "Strong"
-  } else if (resilienceScore >= 50) {
-    resilienceRating = "Healthy"
+  // 2. Dynamic Debt Health based on Dashboard NextGen Score
+  let nextGenRating = "At Risk"
+  if (nextGenScore >= 75) {
+    nextGenRating = "Strong"
+  } else if (nextGenScore >= 50) {
+    nextGenRating = "Healthy"
   } else {
-    resilienceRating = "Weak"
+    nextGenRating = "Weak"
   }
 
-  // 3. Dynamic Resilience Trend Graph tracking Today's Score
+  // 3. Dynamic NextGen Trend Graph tracking Today's Score
   const dayNames = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat']
   const todayName = dayNames[new Date().getDay()]
 
   const dynamicSpendingData = spendingData.map(item => {
     if (item.name === todayName) {
-      return { ...item, amount: resilienceScore }
+      return { ...item, amount: nextGenScore }
     }
     return item
   })
@@ -113,21 +113,21 @@ export function Insights() {
           <CardContent className="p-4 space-y-2">
             <div className="flex items-center justify-between">
               <Shield className="w-4 h-4 text-pink-600" />
-              <Badge className="text-[8px] bg-pink-600/10 text-pink-600 border-none">{resilienceRating}</Badge>
+              <Badge className="text-[8px] bg-pink-600/10 text-pink-600 border-none">{nextGenRating}</Badge>
             </div>
             <p className="text-[10px] font-bold">Debt Health</p>
             <div className="space-y-1.5 pt-2">
               <div className="flex justify-between text-[8px] font-bold">
                 <span>Score</span>
-                <span>{resilienceScore}/100</span>
+                <span>{nextGenScore}/100</span>
               </div>
-              <Progress value={resilienceScore} className="h-1 bg-pink-600/10" />
+              <Progress value={nextGenScore} className="h-1 bg-pink-600/10" />
             </div>
           </CardContent>
         </Card>
       </div>
 
-      {/* Resilience Trend */}
+      {/* NextGen Trend */}
       <Card className="glass-card overflow-hidden">
         <CardHeader className="p-4 pb-2">
           <CardTitle className="text-sm font-medium flex items-center gap-2">

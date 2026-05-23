@@ -276,7 +276,7 @@ export function Settings() {
       </div>
 
       <div className="text-center pt-8">
-        <p className="text-[10px] text-muted-foreground font-medium">Resilience Agent System v1.0.4-alpha</p>
+        <p className="text-[10px] text-muted-foreground font-medium">NextGen Agent System v1.0.4-alpha</p>
         <p className="text-[10px] text-muted-foreground mt-1">Made with 🧬 in Malaysia</p>
       </div>
 

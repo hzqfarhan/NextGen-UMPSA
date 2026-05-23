@@ -5,14 +5,14 @@ import { ShieldCheck, HeartPulse, Wallet, Target, X, Zap } from "lucide-react"
 import { useStore } from "@/store/useStore"
 import { t } from "@/lib/translations"
 
-interface ResilienceModalProps {
+interface NextGenModalProps {
   isOpen: boolean
   onClose: () => void
   score: number
 }
 
-export function ResilienceModal({ isOpen, onClose, score }: ResilienceModalProps) {
-  const { language, resilienceCashflowScore, resilienceSavingsScore, resilienceDebtScore } = useStore()
+export function NextGenModal({ isOpen, onClose, score }: NextGenModalProps) {
+  const { language, nextGenCashflowScore, nextGenSavingsScore, nextGenDebtScore } = useStore()
   const strings = t[language]
 
   // Determine status color and text based on score
@@ -61,25 +61,25 @@ export function ResilienceModal({ isOpen, onClose, score }: ResilienceModalProps
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium">
                       <span className="flex items-center gap-1.5"><Wallet className="w-3.5 h-3.5 text-primary" /> {strings.resModalCashflow}</span>
-                      <span className="text-primary font-bold">{resilienceCashflowScore}%</span>
+                      <span className="text-primary font-bold">{nextGenCashflowScore}%</span>
                     </div>
-                    <Progress value={resilienceCashflowScore} className="h-2 bg-primary/10" />
+                    <Progress value={nextGenCashflowScore} className="h-2 bg-primary/10" />
                   </div>
 
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium">
                       <span className="flex items-center gap-1.5"><Target className="w-3.5 h-3.5 text-emerald-500" /> {strings.resModalSavings}</span>
-                      <span className="text-emerald-600">{resilienceSavingsScore}%</span>
+                      <span className="text-emerald-600">{nextGenSavingsScore}%</span>
                     </div>
-                    <Progress value={resilienceSavingsScore} className="h-2 bg-emerald-100" />
+                    <Progress value={nextGenSavingsScore} className="h-2 bg-emerald-100" />
                   </div>
 
                   <div className="space-y-1.5">
                     <div className="flex justify-between text-xs font-medium">
                       <span className="flex items-center gap-1.5"><ShieldCheck className="w-3.5 h-3.5 text-pink-600" /> {strings.resModalDebt}</span>
-                      <span className="text-pink-700">{resilienceDebtScore}%</span>
+                      <span className="text-pink-700">{nextGenDebtScore}%</span>
                     </div>
-                    <Progress value={resilienceDebtScore} className="h-2 bg-pink-100" />
+                    <Progress value={nextGenDebtScore} className="h-2 bg-pink-100" />
                   </div>
                 </div>
 

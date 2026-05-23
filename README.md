@@ -22,7 +22,7 @@ BeU NextGen separates money into what the user has, what must be protected, and 
 
 - Smart Bill Lock
 - Safe Daily Spend
-- Resilience Score
+- NextGen Score
 - NextGen AI Council
 - Malay Dialect Roast & Toast Engine
 - Impulse Negotiator
@@ -46,7 +46,7 @@ BeU NextGen separates money into what the user has, what must be protected, and 
 
 - `src/app` contains App Router pages, metadata, manifest, and setup flow.
 - `src/components` contains the dashboard, Smart Bill Lock, Cards Hub, Money Move, Pay Scanner, Insights, Savings Missions, and NextGen AI Council UI.
-- `src/store/useStore.ts` contains the simulated wallet, financial state, protected commitments, Safe Daily Spend, Resilience Score, bills, savings, and companion mood state.
+- `src/store/useStore.ts` contains the simulated wallet, financial state, protected commitments, Safe Daily Spend, NextGen Score, bills, savings, and companion mood state.
 - `src/lib` contains financial helpers, bill templates, translations, and shared utilities.
 
 ## Getting Started
@@ -69,7 +69,7 @@ NEXT_PUBLIC_BASE_PATH=
 ## Demo Flow
 
 1. Complete onboarding with allowance, next allowance date, commitments, and a savings goal.
-2. Open the NextGen Command Center to compare Total Balance, Protected Commitments, Spendable Balance, Safe Daily Spend, and Resilience Score.
+2. Open the NextGen Command Center to compare Total Balance, Protected Commitments, Spendable Balance, Safe Daily Spend, and NextGen Score.
 3. Visit Smart Bill Lock and confirm rent, phone, transport, or PTPTN-related commitments are protected.
 4. Use Pay Scanner and choose a risky demo purchase.
 5. Watch the NextGen AI Council evaluate risk, show the Impulse Negotiator, generate a local Roast & Toast message, and preview Future-Me impact.

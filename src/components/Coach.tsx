@@ -39,8 +39,14 @@ interface Message {
 }
 
 export function Coach() {
-  const { user, safeDailySpend, initialSafeDaily, transactions, resilienceScore, language, addSavingsPocket, savingsPockets, bills, addTransaction, pet, currentStreak, membershipTier, streakShieldActive, awfarDrawTickets } = useStore()
+  const { user, safeDailySpend, initialSafeDaily, transactions, nextGenScore, language, addSavingsPocket, savingsPockets, bills, addTransaction, pet, currentStreak, membershipTier, streakShieldActive, awfarDrawTickets } = useStore()
   const strings = t[language]
+  
+  const todayStr = new Date().toDateString();
+  const todaySavings = transactions
+    .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === todayStr)
+    .reduce((sum, t) => sum + t.amount, 0);
+    
   const scrollRef = useRef<HTMLDivElement>(null)
   const bottomRef = useRef<HTMLDivElement>(null)
   const basePath = process.env.NEXT_PUBLIC_BASE_PATH || "";
@@ -165,7 +171,7 @@ export function Coach() {
   const buildAIContext = () => ({
     balance: user.currentBalance,
     safeDailySpend,
-    resilienceScore,
+    nextGenScore,
     isSpendGuardActive: useStore.getState().isSpendGuardActive,
     savingsPockets: savingsPockets.map(p => ({ name: p.name, current: p.current, target: p.target })),
   });
@@ -337,7 +343,7 @@ export function Coach() {
         responseText = "Understood. I've moved this suggestion to the backlog. We'll revisit this when your cashflow improves.";
         break;
       case 'prioritize_emergency':
-        responseText = "Smart move. Prioritizing your Emergency Fund will significantly boost your Resilience Score. Let's manage it in your Savings Hub.";
+        responseText = "Smart move. Prioritizing your Emergency Fund will significantly boost your NextGen Score. Let's manage it in your Savings Hub.";
         redirect = { label: "Go to Savings", href: "/savings" };
         break;
       case 'transfer':
@@ -666,7 +672,7 @@ export function Coach() {
               riskLevel: 'medium'
             }
           })
-        } else if (user.currentBalance < 500 || resilienceScore < 60) {
+        } else if (user.currentBalance < 500 || nextGenScore < 60) {
           responses.push({
             role: 'assistant',
             agent: 'Savings Sentinel',
@@ -770,7 +776,7 @@ export function Coach() {
           responses.push({
             role: 'assistant',
             agent: agentName,
-            content: `The best growth opportunity right now is your ASB or high-yield savings account. Market volatility in crypto makes it a high-risk move for your current resilience level.`
+            content: `The best growth opportunity right now is your ASB or high-yield savings account. Market volatility in crypto makes it a high-risk move for your NextGen Score.`
           });
         }
       } else {
@@ -873,7 +879,7 @@ export function Coach() {
             </div>
           </div>
           <Badge variant="outline" className="text-[10px] bg-emerald-500/10 border-emerald-500/20 text-emerald-500 font-bold px-2 py-1">
-            HEALTH: {resilienceScore}%
+            HEALTH: {nextGenScore}%
           </Badge>
         </div>
       </header>
@@ -920,6 +926,7 @@ export function Coach() {
                     {/* Streak Pill */}
                     <div className={cn(
                       "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
+                      todaySavings < 5.0 ? "bg-slate-100/80 border-slate-200 text-slate-400 grayscale opacity-70" :
                       currentStreak < 7 ? "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]" :
                       currentStreak < 30 ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
                       "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#CC0D5A]"
@@ -1431,7 +1438,7 @@ export function Coach() {
                                        </div>
                                        
                                        <div className="flex justify-between items-center bg-[#F8F8F8] p-2 rounded-lg border border-pink-100">
-                                           <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">Resilience Check</span>
+                                           <span className="text-[8px] text-muted-foreground uppercase font-bold tracking-wider">NextGen Check</span>
                                            <Badge 
                                              variant="outline" 
                                              className={cn(

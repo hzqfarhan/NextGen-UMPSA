@@ -9,7 +9,7 @@ import { TrendingUp, AlertTriangle, ShieldCheck, Wallet, Settings as SettingsIco
 import { cn } from "@/lib/utils"
 import { useState, useEffect } from "react"
 import { SpendGuardModal } from "./BudgetGuardModal"
-import { ResilienceModal } from "./ResilienceModal"
+import { NextGenModal } from "./NextGenModal"
 import { TopUpModal } from "./TopUpModal"
 import { RewardsModal } from "./RewardsModal"
 import Link from "next/link"
@@ -22,7 +22,7 @@ import { StreakShareCard } from "./StreakShareCard"
 export function Dashboard() {
   const {
     user,
-    resilienceScore,
+    nextGenScore,
     safeDailySpend,
     initialSafeDaily,
     transactions,
@@ -49,8 +49,11 @@ export function Dashboard() {
     .reduce((sum, b) => sum + b.amount, 0);
   const spendableBalance = user.currentBalance - lockedAmount;
   const totalAssets = user.currentBalance + savingsPockets.reduce((sum, p) => sum + p.current, 0);
+  const todaySavings = transactions
+    .filter(t => t.type === 'saving' && new Date(t.date).toDateString() === new Date().toDateString())
+    .reduce((sum, t) => sum + t.amount, 0);
   const [showGuardModal, setShowGuardModal] = useState(false)
-  const [showResilienceModal, setShowResilienceModal] = useState(false)
+  const [showNextGenModal, setShowNextGenModal] = useState(false)
   const [showTopUpModal, setShowTopUpModal] = useState(false)
   const [showRewardsModal, setShowRewardsModal] = useState(false)
 
@@ -123,7 +126,7 @@ export function Dashboard() {
     useStore.getState().checkAndRefreshDailyQuota()
     processAutoSave()
     simulateGrowth()
-    useStore.getState().updateResilienceScore()
+    useStore.getState().updateNextGenScore()
   }, [])
 
   const getDaysRemaining = () => {
@@ -203,11 +206,11 @@ export function Dashboard() {
           </Link>
           <motion.button
             whileTap={{ scale: 0.9 }}
-            onClick={() => setShowResilienceModal(true)}
+            onClick={() => setShowNextGenModal(true)}
             className="w-10 h-10 rounded-xl bg-primary/10 border border-primary/20 flex items-center justify-center text-primary font-bold text-xs relative overflow-hidden group shadow-sm shadow-primary/20 hover:bg-primary/20 transition-colors"
           >
             <span className="absolute inset-0 bg-white/20 blur-sm translate-x-[-100%] group-hover:translate-x-[100%] transition-transform duration-1000"></span>
-            {resilienceScore}%
+            {nextGenScore}%
           </motion.button>
         </div>
       </header>
@@ -371,22 +374,19 @@ export function Dashboard() {
                     alt="Streak Icon"
                     className="w-12 h-12 object-contain transition-all duration-500"
                     style={{
-                      filter: currentStreak < 7
-                        ? "hue-rotate(15deg) saturate(2.5) drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))"
-                        : currentStreak < 30
-                          ? "hue-rotate(200deg) saturate(2.2) drop-shadow(0 0 8px rgba(37, 99, 235, 0.6))"
-                          : "hue-rotate(280deg) saturate(2.5) brightness(1.1) drop-shadow(0 0 12px rgba(168, 85, 247, 0.7))"
+                      filter: todaySavings < 5.0
+                        ? "grayscale(1) opacity(0.4)"
+                        : currentStreak < 7
+                          ? "hue-rotate(15deg) saturate(2.5) drop-shadow(0 0 8px rgba(249, 115, 22, 0.5))"
+                          : currentStreak < 30
+                            ? "hue-rotate(200deg) saturate(2.2) drop-shadow(0 0 8px rgba(37, 99, 235, 0.6))"
+                            : "hue-rotate(280deg) saturate(2.5) brightness(1.1) drop-shadow(0 0 12px rgba(168, 85, 247, 0.7))"
                     }}
                   />
                 )}
                 <div>
                   <div className="flex items-center gap-2">
                     <span className="text-lg font-black text-black">{currentStreak} {language === 'en' ? 'Days Streak' : 'Hari Streak'}</span>
-                    {streakShieldActive && (
-                      <Badge variant="secondary" className="bg-blue-100 text-blue-700 hover:bg-blue-100 border border-blue-200 flex items-center gap-1 text-[9px] font-bold px-1.5 py-0.5">
-                        🛡️ Shield Active
-                      </Badge>
-                    )}
                   </div>
                   <p className="text-[10px] text-muted-foreground font-medium">
                     {language === 'en' ? 'Highest Streak:' : 'Streak Tertinggi:'} <span className="font-bold text-black">{highestStreak} {language === 'en' ? 'days' : 'hari'}</span>
@@ -490,10 +490,10 @@ export function Dashboard() {
         onClose={() => setShowGuardModal(false)}
       />
 
-      <ResilienceModal
-        isOpen={showResilienceModal}
-        onClose={() => setShowResilienceModal(false)}
-        score={resilienceScore}
+      <NextGenModal
+        isOpen={showNextGenModal}
+        onClose={() => setShowNextGenModal(false)}
+        score={nextGenScore}
       />
 
       <TopUpModal

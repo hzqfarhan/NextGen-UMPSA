@@ -7,7 +7,7 @@ import { NextRequest, NextResponse } from 'next/server';
 // CREATE TABLE IF NOT EXISTS user_sync (
 //     user_name VARCHAR(100) PRIMARY KEY,
 //     balance NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-//     resilience_score INTEGER NOT NULL DEFAULT 60,
+//     nextgen_score INTEGER NOT NULL DEFAULT 60,
 //     streak INTEGER NOT NULL DEFAULT 0,
 //     state_data JSONB NOT NULL,
 //     updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -74,7 +74,7 @@ export async function POST(req: NextRequest) {
         }
 
         const body = await req.json();
-        const { userName, balance, resilienceScore, streak, stateData } = body;
+        const { userName, balance, nextGenScore, streak, stateData } = body;
 
         if (!userName || stateData === undefined) {
             return NextResponse.json(
@@ -103,7 +103,7 @@ export async function POST(req: NextRequest) {
             CREATE TABLE IF NOT EXISTS user_sync (
                 user_name VARCHAR(100) PRIMARY KEY,
                 balance NUMERIC(10, 2) NOT NULL DEFAULT 0.00,
-                resilience_score INTEGER NOT NULL DEFAULT 60,
+                nextgen_score INTEGER NOT NULL DEFAULT 60,
                 streak INTEGER NOT NULL DEFAULT 0,
                 state_data JSONB NOT NULL,
                 updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -112,19 +112,19 @@ export async function POST(req: NextRequest) {
 
         // Upsert state data
         await client.query(
-            `INSERT INTO user_sync (user_name, balance, resilience_score, streak, state_data, updated_at)
+            `INSERT INTO user_sync (user_name, balance, nextgen_score, streak, state_data, updated_at)
              VALUES ($1, $2, $3, $4, $5, CURRENT_TIMESTAMP)
              ON CONFLICT (user_name) 
              DO UPDATE SET 
                 balance = EXCLUDED.balance,
-                resilience_score = EXCLUDED.resilience_score,
+                nextgen_score = EXCLUDED.nextgen_score,
                 streak = EXCLUDED.streak,
                 state_data = EXCLUDED.state_data,
                 updated_at = CURRENT_TIMESTAMP`,
             [
                 userName,
                 balance || 0,
-                resilienceScore || 60,
+                nextGenScore || 60,
                 streak || 0,
                 JSON.stringify(stateData)
             ]

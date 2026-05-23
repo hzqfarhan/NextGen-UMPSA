@@ -107,7 +107,7 @@ export function DepositModal({ isOpen, onClose, pocket }: DepositModalProps) {
                 This will adjust your daily safe spending limit from <span className="font-bold text-primary">RM {safeDailyBefore.toFixed(2)}/day</span> to <span className="font-bold text-amber-400">RM {safeDailyAfter.toFixed(2)}/day</span>.
               </p>
               <p className="font-semibold text-emerald-400">
-                ✨ Your Resilience Score remains fully protected since savings count as assets!
+                ✨ Your NextGen Score remains fully protected since savings count as assets!
               </p>
             </div>
           )}
