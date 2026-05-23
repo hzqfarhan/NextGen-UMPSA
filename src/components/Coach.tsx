@@ -16,18 +16,18 @@ import { Pet } from "@/components/ui/Pet"
 import Link from "next/link"
 
 const COMPANIONS = [
-  { id: 'uteh', name: 'Uteh', tierRequired: 'Bronze', label: 'Novice' },
-  { id: 'zuko', name: 'Zuko', tierRequired: 'Silver', label: 'Pro' },
-  { id: 'oreo', name: 'Oreo', tierRequired: 'Silver', label: 'Pro' },
-  { id: 'oyen', name: 'Oyen', tierRequired: 'Gold', label: 'Legend' },
-  { id: 'yunn', name: 'Yunn', tierRequired: 'Gold', label: 'Legend' },
-  { id: 'lico', name: 'Lico', tierRequired: 'Gold', label: 'Legend' },
+  { id: 'uteh', name: 'Uteh', tierRequired: 'Novice', label: 'Novice' },
+  { id: 'zuko', name: 'Zuko', tierRequired: 'Pro', label: 'Pro' },
+  { id: 'oreo', name: 'Oreo', tierRequired: 'Pro', label: 'Pro' },
+  { id: 'oyen', name: 'Oyen', tierRequired: 'Legend', label: 'Legend' },
+  { id: 'yunn', name: 'Yunn', tierRequired: 'Legend', label: 'Legend' },
+  { id: 'lico', name: 'Lico', tierRequired: 'Legend', label: 'Legend' },
 ]
 
 function canUnlockCompanion(tierRequired: string, userTier: string) {
-  if (tierRequired === 'Bronze') return true;
-  if (tierRequired === 'Silver') return userTier === 'Silver' || userTier === 'Gold';
-  if (tierRequired === 'Gold') return userTier === 'Gold';
+  if (tierRequired === 'Novice') return true;
+  if (tierRequired === 'Pro') return userTier === 'Pro' || userTier === 'Legend';
+  if (tierRequired === 'Legend') return userTier === 'Legend';
   return false;
 }
 
@@ -1014,13 +1014,13 @@ export function Coach() {
             {/* Tier Pill */}
             <div className={cn(
               "flex-1 px-2.5 py-1.5 rounded-full border text-center flex items-center justify-center gap-1.5 text-[9.5px] font-extrabold transition-all duration-300 whitespace-nowrap backdrop-blur-md shadow-sm",
-              membershipTier === 'Gold' ? "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#DF0059]" :
-              membershipTier === 'Silver' ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
+              membershipTier === 'Legend' ? "bg-gradient-to-r from-[#FAE7EF]/80 to-[#FFE9F2]/60 border-[#F3C7D8] text-[#DF0059]" :
+              membershipTier === 'Pro' ? "bg-gradient-to-r from-[#E9F2FE]/80 to-[#FFE9F2]/60 border-[#D3E4FE] text-[#1C62C7]" :
               "bg-gradient-to-r from-[#FFFAEA]/80 to-[#FFE9F2]/60 border-[#FFF4D5] text-[#CBA024]"
             )}>
               <span>
-                {membershipTier === 'Gold' ? '🏆 Legend' :
-                 membershipTier === 'Silver' ? '🥈 Pro' :
+                {membershipTier === 'Legend' ? '🏆 Legend' :
+                 membershipTier === 'Pro' ? '🥈 Pro' :
                  '🥉 Novice'}
               </span>
             </div>
@@ -1907,8 +1907,8 @@ export function Coach() {
                     <div className="text-center w-full">
                       <p className="text-sm font-black text-slate-800">{c.name}</p>
                       <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded-full mt-1 inline-block",
-                        c.tierRequired === 'Bronze' ? "bg-orange-100 text-orange-700" :
-                        c.tierRequired === 'Silver' ? "bg-blue-100 text-blue-700" :
+                        c.tierRequired === 'Novice' ? "bg-orange-100 text-orange-700" :
+                        c.tierRequired === 'Pro' ? "bg-blue-100 text-blue-700" :
                         "bg-pink-100 text-pink-700"
                       )}>
                         {c.label} {unlocked ? "" : "🔒"}
@@ -1939,8 +1939,16 @@ export function Coach() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-zinc-950/95 backdrop-blur-2xl z-[99] flex flex-col justify-between p-6 text-center select-none"
+            className="absolute inset-0 z-[99] flex flex-col justify-between p-6 text-center select-none overflow-hidden"
           >
+            {/* Background bot.gif with soft light-mode gradient wash */}
+            <img
+              src={`${basePath}/assets/bot.gif`}
+              alt=""
+              className="absolute inset-0 w-full h-full object-cover z-0 opacity-22 mix-blend-overlay pointer-events-none"
+            />
+            <div className="absolute inset-0 z-0 pointer-events-none bg-[radial-gradient(circle_at_50%_48%,rgba(223,0,89,0.14),transparent_35%),linear-gradient(180deg,rgba(255,255,255,0.96),rgba(255,233,242,0.92))]" />
+
             {/* Custom slow-spin styles */}
             <style>{`
               @keyframes spin-slow {
@@ -1953,33 +1961,67 @@ export function Coach() {
             `}</style>
 
             {/* Top header */}
-            <div className="flex justify-between items-center w-full mt-4">
-              <span className="text-xs font-mono text-purple-400 uppercase tracking-widest font-bold">Voice Assistant Mode</span>
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold bg-red-500/10 text-red-400 border border-red-500/20">
-                <span className="h-2 w-2 rounded-full bg-red-500 animate-ping"></span>
+            <div className="flex justify-between items-center w-full mt-4 z-10">
+              <span className="text-xs font-mono text-[#CC0D5A] uppercase tracking-widest font-black">Voice Assistant Mode</span>
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-extrabold bg-[#FFE9F2] text-[#DF0059] border border-[#F3C7D8] shadow-sm">
+                <span className="h-2 w-2 rounded-full bg-[#DF0059] animate-ping"></span>
                 Recording
               </span>
             </div>
 
             {/* Main content area */}
-            <div className="flex-1 flex flex-col items-center justify-center gap-8 px-4">
-              {/* Glowing animated orb (Aura style) */}
+            <div className="flex-1 flex flex-col items-center justify-center gap-6 px-4 z-10">
+              {/* Glowing animated orb (Aura style in light mode) */}
               <div className="relative w-48 h-48 flex items-center justify-center">
-                {/* Outer pulsing glow */}
-                <div className="absolute inset-0 rounded-full bg-gradient-to-r from-purple-600 via-pink-500 to-blue-500 opacity-25 blur-3xl animate-pulse scale-125"></div>
+                {/* Swirling, organic liquid glow aura */}
+                <motion.div 
+                  className="absolute inset-0 rounded-full bg-gradient-to-r from-[#DF0059] via-[#E06E9C] to-[#237AF9] blur-3xl pointer-events-none"
+                  animate={{
+                    scale: [1.2, 1.45, 1.15, 1.38, 1.2],
+                    rotate: [0, 90, 180, 270, 360],
+                    opacity: [0.22, 0.38, 0.18, 0.32, 0.22]
+                  }}
+                  transition={{
+                    duration: 7,
+                    repeat: Infinity,
+                    ease: "easeInOut"
+                  }}
+                />
                 {/* Medium glowing spinning orb */}
-                <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-purple-500 via-indigo-600 to-cyan-400 opacity-60 blur-md animate-spin-slow"></div>
+                <div className="absolute inset-2 rounded-full bg-gradient-to-tr from-[#DF0059] via-[#CC0D5A] to-[#FFC107] opacity-40 blur-md animate-spin-slow"></div>
                 {/* Core glass-looking orb */}
-                <div className="absolute inset-4 rounded-full bg-gradient-to-br from-white/10 to-black border border-white/10 shadow-2xl backdrop-blur-2xl flex items-center justify-center">
-                  <Mic className="w-10 h-10 text-white animate-pulse" />
+                <div className="absolute inset-4 rounded-full bg-white/80 border border-white/60 shadow-xl backdrop-blur-md flex items-center justify-center">
+                  <Mic className="w-10 h-10 text-[#DF0059] animate-pulse" />
                 </div>
+              </div>
+
+              {/* Bouncing Soundwave Equalizer */}
+              <div className="flex items-end justify-center gap-1.5 h-16 w-full max-w-[220px] mt-2">
+                {[0.2, 0.4, 0.6, 0.8, 0.95, 0.75, 0.5, 0.3, 0.5, 0.75, 0.95, 0.8, 0.6, 0.4, 0.2].map((multiplier, i) => (
+                  <motion.div
+                    key={i}
+                    className="w-1.5 rounded-full bg-gradient-to-t from-[#DF0059] via-[#CC0D5A] to-[#E06E9C]"
+                    style={{
+                      height: '8px'
+                    }}
+                    animate={{
+                      height: ['8px', `${multiplier * 44 + 8}px`, '8px']
+                    }}
+                    transition={{
+                      duration: 0.55 + (i % 4) * 0.08,
+                      repeat: Infinity,
+                      ease: 'easeInOut',
+                      delay: i * 0.035
+                    }}
+                  />
+                ))}
               </div>
 
               {/* Status and transcription */}
               <div className="space-y-4 max-w-sm w-full">
-                <p className="text-xs text-purple-300/80 font-bold uppercase tracking-widest">Listening...</p>
+                <p className="text-xs text-[#E06E9C] font-black uppercase tracking-widest">Listening...</p>
                 <div className="min-h-16 flex items-center justify-center">
-                  <p className="text-lg font-medium leading-relaxed bg-gradient-to-b from-white via-slate-100 to-slate-400 bg-clip-text text-transparent break-words transition-all duration-300">
+                  <p className="text-lg font-black leading-relaxed text-[#221F20] break-words transition-all duration-300">
                     {interimTranscript || (input ? input : "Start speaking your financial query...")}
                   </p>
                 </div>
@@ -1987,7 +2029,7 @@ export function Coach() {
             </div>
 
             {/* Bottom actions */}
-            <div className="mb-8 flex flex-col items-center gap-4">
+            <div className="mb-8 flex flex-col items-center gap-4 z-10">
               <button
                 type="button"
                 onClick={() => {
@@ -1996,11 +2038,11 @@ export function Coach() {
                   }
                   setIsListening(false);
                 }}
-                className="w-16 h-16 rounded-full bg-gradient-to-tr from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 text-white flex items-center justify-center shadow-lg shadow-purple-500/20 hover:scale-105 active:scale-95 transition-all border border-white/20 z-50 cursor-pointer"
+                className="w-16 h-16 rounded-full bg-gradient-to-tr from-[#DF0059] to-[#CC0D5A] hover:from-[#CC0D5A] hover:to-[#DF0059] text-white flex items-center justify-center shadow-lg shadow-[#DF0059]/25 hover:scale-105 active:scale-95 transition-all border border-[#F5CFDE] z-50 cursor-pointer"
               >
                 <MicOff className="w-6 h-6" />
               </button>
-              <p className="text-[10px] text-slate-500 uppercase tracking-widest">Tap to stop & send</p>
+              <p className="text-[10px] text-[#727272] uppercase tracking-widest font-extrabold">Tap to stop & send</p>
             </div>
           </motion.div>
         )}

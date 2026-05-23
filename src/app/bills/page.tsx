@@ -13,7 +13,7 @@ export default function BillsPage() {
   }, [])
 
   return (
-    <main className="min-h-screen bg-slate-50/30 dark:bg-slate-950/30">
+    <main className="min-h-screen bg-gradient-to-tr from-[#fdf2f8] via-[#F8F8F8] to-[#f1f5f9] py-4">
       <Bills />
     </main>
   )

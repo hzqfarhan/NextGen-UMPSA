@@ -5,14 +5,14 @@ import { Pet } from "./ui/Pet";
 interface StreakShareCardProps {
   currentStreak: number;
   highestStreak: number;
-  membershipTier: 'Bronze' | 'Silver' | 'Gold';
+  membershipTier: 'Novice' | 'Pro' | 'Legend';
   streakShieldActive: boolean;
 }
 
 export const StreakShareCard = forwardRef<HTMLDivElement, StreakShareCardProps>(
   ({ currentStreak, highestStreak, membershipTier, streakShieldActive }, ref) => {
     
-    const displayTier = membershipTier === 'Gold' ? 'Legend' : membershipTier === 'Silver' ? 'Pro' : 'Novice';
+    const displayTier = membershipTier;
     
     // 9:16 aspect ratio share card: 360x640 in premium high-contrast light mode
     return (
@@ -31,11 +31,11 @@ export const StreakShareCard = forwardRef<HTMLDivElement, StreakShareCardProps>(
         <div className="flex flex-col items-center gap-2 z-10 w-full mt-4">
           <div className={cn(
             "px-4 py-1.5 rounded-full border bg-white/60 backdrop-blur-md text-sm font-black shadow-sm flex items-center gap-2",
-            membershipTier === 'Gold' ? "border-purple-300 bg-purple-50 text-purple-700 shadow-purple-100" :
-            membershipTier === 'Silver' ? "border-blue-300 bg-blue-50 text-blue-700 shadow-blue-100" :
+            membershipTier === 'Legend' ? "border-purple-300 bg-purple-50 text-purple-700 shadow-purple-100" :
+            membershipTier === 'Pro' ? "border-blue-300 bg-blue-50 text-blue-700 shadow-blue-100" :
             "border-orange-300 bg-orange-50 text-orange-700 shadow-orange-100"
           )}>
-            {membershipTier === 'Gold' ? '🏆' : membershipTier === 'Silver' ? '🥈' : '🥉'}
+            {membershipTier === 'Legend' ? '🏆' : membershipTier === 'Pro' ? '🥈' : '🥉'}
             {displayTier} Tier
           </div>
           {streakShieldActive && (

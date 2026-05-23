@@ -59,16 +59,16 @@ export function Bills() {
     <div className="p-4 space-y-6 pb-24 max-w-lg mx-auto text-slate-900">
       {/* Header */}
       <header className="flex items-center justify-between gap-4 pt-2">
-        <Link href="/dashboard" className="p-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-600 hover:text-primary transition-colors">
+        <Link href="/dashboard" className="p-2 rounded-xl bg-white border border-pink-100 text-[#727272] hover:bg-[#FFE9F2] hover:text-[#DF0059] transition-all hover:scale-105 active:scale-95 shadow-sm">
           <ChevronLeft className="w-5 h-5" />
         </Link>
         <div className="flex-1">
           <h1 className="text-xl font-black tracking-tight text-slate-900">{strings.billsHeader}</h1>
-          <p className="text-slate-500 text-[10px] font-bold uppercase tracking-widest leading-tight">PROTECT YOUR ESSENTIALS</p>
+          <p className="text-[#CC0D5A] text-[9px] font-black uppercase tracking-widest leading-tight">PROTECT YOUR ESSENTIALS</p>
         </div>
         <button 
           onClick={() => setShowAddModal(true)}
-          className="w-10 h-10 rounded-full bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20 hover:scale-110 active:scale-95 transition-all"
+          className="w-10 h-10 rounded-full bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] hover:opacity-95 flex items-center justify-center text-white shadow-lg shadow-[#DF0059]/25 hover:scale-110 active:scale-95 transition-all"
         >
           <Plus className="w-6 h-6" />
         </button>
@@ -76,27 +76,27 @@ export function Bills() {
 
       {/* Top Summary Cards */}
       <div className="grid grid-cols-3 gap-2">
-        <div className="bg-white/80 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-pink-500/30 shadow-[0_8px_32px_rgba(223,0,89,0.06)] hover:scale-102 transition-all duration-300">
-          <span className="text-[8px] font-black uppercase tracking-widest text-pink-600 leading-none">{strings.billsProtected}</span>
+        <div className="bg-gradient-to-br from-[#FAE7EF] to-[#FFE9F2]/70 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-[#F3C7D8] shadow-[0_8px_30px_rgba(223,0,89,0.04)] hover:scale-[1.03] transition-all duration-300">
+          <span className="text-[8px] font-black uppercase tracking-widest text-[#CC0D5A] leading-none">{strings.billsProtected}</span>
           <div className="flex items-center gap-1.5">
-            <ShieldCheck className="w-3.5 h-3.5 text-pink-600 flex-shrink-0" />
-            <p className="text-[13px] font-black text-slate-900 leading-none whitespace-nowrap">RM{lockedAmount.toFixed(0)}</p>
+            <ShieldCheck className="w-3.5 h-3.5 text-[#DF0059] flex-shrink-0" />
+            <p className="text-[12px] font-black text-[#221F20] leading-none whitespace-nowrap">RM {lockedAmount.toFixed(0)}</p>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-slate-200 shadow-[0_8px_32px_rgba(0,0,0,0.04)] hover:scale-102 transition-all duration-300">
-          <span className="text-[8px] font-black uppercase tracking-widest text-slate-500 leading-none">{strings.billsNext}</span>
+        <div className="bg-white/90 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-slate-200/80 shadow-[0_8px_30px_rgba(0,0,0,0.02)] hover:scale-[1.03] transition-all duration-300">
+          <span className="text-[8px] font-black uppercase tracking-widest text-[#727272] leading-none">{strings.billsNext}</span>
           <div className="flex items-center gap-1.5">
-            <CalendarClock className="w-3.5 h-3.5 text-slate-500 flex-shrink-0" />
-            <p className="text-[10px] font-black leading-none text-slate-900 truncate max-w-[60px]">{nextBill ? nextBill.name : '-'}</p>
+            <CalendarClock className="w-3.5 h-3.5 text-[#727272] flex-shrink-0" />
+            <p className="text-[10px] font-black leading-none text-[#221F20] truncate max-w-[70px]">{nextBill ? nextBill.name : '-'}</p>
           </div>
         </div>
 
-        <div className="bg-white/80 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-emerald-500/30 shadow-[0_8px_32px_rgba(16,185,129,0.06)] hover:scale-102 transition-all duration-300">
-          <span className="text-[8px] font-black uppercase tracking-widest text-emerald-600 leading-none">{strings.billsAutoPay}</span>
+        <div className="bg-gradient-to-br from-[#E8F6EF] to-emerald-50/40 backdrop-blur-md rounded-[1.5rem] p-3 flex flex-col gap-1.5 border border-emerald-200/80 shadow-[0_8px_30px_rgba(16,185,129,0.03)] hover:scale-[1.03] transition-all duration-300">
+          <span className="text-[8px] font-black uppercase tracking-widest text-emerald-700 leading-none">{strings.billsAutoPay}</span>
           <div className="flex items-center gap-1.5">
             <Zap className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0" />
-            <p className="text-[13px] font-black leading-none text-slate-900 whitespace-nowrap">{autoPayCount} {strings.billsActive}</p>
+            <p className="text-[12px] font-black leading-none text-[#221F20] whitespace-nowrap">{autoPayCount} {strings.billsActive}</p>
           </div>
         </div>
       </div>
@@ -121,24 +121,26 @@ export function Bills() {
       )}
 
       {/* Tabs */}
-      <div className="flex p-1 bg-slate-100/90 backdrop-blur-md border border-slate-200/80 rounded-2xl shadow-inner">
+      <div className="flex p-1.5 bg-[#F8F8F8] border border-slate-200/70 rounded-2xl shadow-inner">
         <button
           onClick={() => setActiveTab('upcoming')}
-          className={`flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 ${
+          className={cn(
+            "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 select-none",
             activeTab === 'upcoming' 
-              ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' 
-              : 'text-slate-500 hover:text-slate-900'
-          }`}
+              ? 'bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] text-white shadow-md shadow-[#DF0059]/20' 
+              : 'text-[#727272] hover:text-[#DF0059]'
+          )}
         >
           {strings.billsUpcoming} ({upcomingBills.length})
         </button>
         <button
           onClick={() => setActiveTab('paid')}
-          className={`flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 ${
+          className={cn(
+            "flex-1 py-2.5 text-xs font-black uppercase tracking-wider rounded-xl transition-all duration-300 select-none",
             activeTab === 'paid' 
-              ? 'bg-slate-900 text-white shadow-lg shadow-slate-900/10' 
-              : 'text-slate-500 hover:text-slate-900'
-          }`}
+              ? 'bg-gradient-to-r from-[#DF0059] to-[#CC0D5A] text-white shadow-md shadow-[#DF0059]/20' 
+              : 'text-[#727272] hover:text-[#DF0059]'
+          )}
         >
           {strings.billsPaid} ({paidBills.length})
         </button>
@@ -174,12 +176,12 @@ export function Bills() {
       {/* Footer Actions */}
       <div className="flex justify-center">
         <motion.button 
-          whileHover={{ scale: 1.02 }}
-          whileTap={{ scale: 0.98 }}
+          whileHover={{ scale: 1.04 }}
+          whileTap={{ scale: 0.96 }}
           onClick={() => processAutoPay()}
-          className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white/80 border border-slate-200/80 text-slate-500 hover:text-slate-900 transition-all hover:bg-slate-50 hover:border-slate-300 shadow-sm"
+          className="flex items-center gap-2 px-6 py-3 rounded-2xl bg-white hover:bg-[#FFE9F2]/30 border border-[#F3C7D8]/80 text-[#CC0D5A] hover:text-[#DF0059] transition-all shadow-sm"
         >
-          <RefreshCcw className="w-4 h-4" />
+          <RefreshCcw className="w-4 h-4 animate-spin-slow" />
           <span className="text-[10px] font-black uppercase tracking-widest">Process Simulated AutoPay</span>
         </motion.button>
       </div>

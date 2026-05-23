@@ -62,8 +62,8 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
   // Tiers descriptions
   const tiers = [
     {
-      id: 'Bronze',
-      name: language === 'en' ? 'Novice' : 'Novice',
+      id: 'Novice',
+      name: 'Novice',
       milestone: 'Base level (0–6 Day Streak)',
       perks: [
         'Baseline conversational access to 4 specialized AI Council Agents.',
@@ -75,8 +75,8 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
       active: true // default
     },
     {
-      id: 'Silver',
-      name: language === 'en' ? 'Pro' : 'Pro',
+      id: 'Pro',
+      name: 'Pro',
       milestone: 'Maintain 7-Day Streak',
       perks: [
         'Unlocks Be U Awfar Nest integration prompts.',
@@ -90,8 +90,8 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
       active: currentStreak >= 7
     },
     {
-      id: 'Gold',
-      name: language === 'en' ? 'Legend' : 'Legend',
+      id: 'Legend',
+      name: 'Legend',
       milestone: 'Maintain 30-Day Streak',
       perks: [
         'Unlocks premium BeU MaxCash Term Deposit-i Hybrid Simulator.',
@@ -172,11 +172,11 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                     <span className="text-slate-400 font-medium font-bold">Tier:</span>
                     <Badge className={cn(
                       "ml-0.5 font-bold text-[9px] px-1.5 py-0.5 rounded-lg border shrink-0",
-                      membershipTier === 'Gold' ? "bg-purple-100 text-purple-700 border-purple-200" :
-                      membershipTier === 'Silver' ? "bg-blue-100 text-blue-700 border-blue-200" :
+                      membershipTier === 'Legend' ? "bg-purple-100 text-purple-700 border-purple-200" :
+                      membershipTier === 'Pro' ? "bg-blue-100 text-blue-700 border-blue-200" :
                       "bg-orange-100 text-orange-700 border-orange-200"
                     )}>
-                      {membershipTier === 'Gold' ? 'Legend' : membershipTier === 'Silver' ? 'Pro' : 'Novice'}
+                      {membershipTier}
                     </Badge>
                   </div>
                   {streakShieldActive && (
@@ -323,13 +323,13 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                         </div>
                       </div>
 
-                      {/* Locked check for Silver Saver (7+ Days) */}
+                      {/* Locked check for Pro Saver (7+ Days) */}
                       {currentStreak < 7 ? (
                         <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center space-y-2">
                           <Lock className="w-8 h-8 text-slate-400 mx-auto" />
                           <h4 className="text-xs font-bold text-slate-800">Awfar Nest Locked</h4>
                           <p className="text-[10px] text-slate-500 max-w-xs mx-auto">
-                            Requires a **7-Day Saving Streak** (Silver Saver Tier) to unlock Awfar Nest saving triggers. Keep staying in the green!
+                            Requires a **7-Day Saving Streak** (Pro Saver Tier) to unlock Awfar Nest saving triggers. Keep staying in the green!
                           </p>
                         </div>
                       ) : (
@@ -404,13 +404,13 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                         </p>
                       </div>
 
-                      {/* Locked check for Gold Guardian (30+ Days) */}
+                      {/* Locked check for Legend Guardian (30+ Days) */}
                       {currentStreak < 30 ? (
                         <div className="bg-slate-50 border border-slate-200 rounded-xl p-6 text-center space-y-2">
                           <Lock className="w-8 h-8 text-slate-400 mx-auto" />
                           <h4 className="text-xs font-bold text-slate-800">MaxCash TD-i Locked</h4>
                           <p className="text-[10px] text-slate-500 max-w-xs mx-auto">
-                            Requires a **30-Day Saving Streak** (Gold Guardian Tier) to unlock simulated access to fixed Term Deposit instruments. Keep going!
+                            Requires a **30-Day Saving Streak** (Legend Guardian Tier) to unlock simulated access to fixed Term Deposit instruments. Keep going!
                           </p>
                         </div>
                       ) : (
@@ -444,7 +444,7 @@ export function RewardsModal({ isOpen, onClose }: RewardsModalProps) {
                               </div>
                             </div>
                             <span className="text-[9px] text-slate-400 block leading-normal">
-                              * Note: Tying your savings to Gold Guardian tier also automatically boosts your standard savings pockets rate in the store from 6.5% to 7.0% p.a.
+                              * Note: Tying your savings to Legend Guardian tier also automatically boosts your standard savings pockets rate in the store from 6.5% to 7.0% p.a.
                             </span>
                           </div>
                         </div>

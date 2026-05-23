@@ -403,12 +403,12 @@ export function Dashboard() {
               <div className="text-right">
                 <Badge className={cn(
                   "font-bold text-xs px-2.5 py-1 rounded-lg border shadow-sm",
-                  membershipTier === 'Gold' ? "bg-purple-100 text-purple-700 border-purple-300" :
-                    membershipTier === 'Silver' ? "bg-blue-100 text-blue-700 border-blue-200" :
+                  membershipTier === 'Legend' ? "bg-purple-100 text-purple-700 border-purple-300" :
+                    membershipTier === 'Pro' ? "bg-blue-100 text-blue-700 border-blue-200" :
                       "bg-orange-100 text-orange-700 border-orange-300"
                 )}>
-                  {membershipTier === 'Gold' ? '🏆 Legend' :
-                    membershipTier === 'Silver' ? '🥈 Pro' :
+                  {membershipTier === 'Legend' ? '🏆 Legend' :
+                    membershipTier === 'Pro' ? '🥈 Pro' :
                       '🥉 Novice'}
                 </Badge>
               </div>

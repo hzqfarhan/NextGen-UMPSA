@@ -209,7 +209,7 @@ interface NextGenState {
   currentStreak: number;
   highestStreak: number;
   lastCalculatedDate: string;
-  membershipTier: 'Bronze' | 'Silver' | 'Gold';
+  membershipTier: 'Novice' | 'Pro' | 'Legend';
   streakShieldActive: boolean;
   awfarDrawTickets: number;
   isBimbMigrated: boolean;
@@ -384,7 +384,7 @@ export const initialStoreState = {
   currentStreak: 0,
   highestStreak: 0,
   lastCalculatedDate: '',
-  membershipTier: 'Bronze' as const,
+  membershipTier: 'Novice' as const,
   streakShieldActive: false,
   awfarDrawTickets: 0,
   isBimbMigrated: false,
@@ -556,15 +556,15 @@ const useStoreBase = create<NextGenState>()(
           if (isFirstTimeMeetingQuota) {
             streakUpdated += 1;
             highest = Math.max(highest, streakUpdated);
-            if (streakUpdated >= 30) tier = 'Gold';
-            else if (streakUpdated >= 7) tier = 'Silver';
+            if (streakUpdated >= 30) tier = 'Legend';
+            else if (streakUpdated >= 7) tier = 'Pro';
             
             petMessage = `Awesome save! You've met today's savings quota of RM 1.00 and protected your streak! Your streak is now ${streakUpdated} days! 🔥`;
             petAnimation = "excited";
             
             if (tier !== state.membershipTier) {
-              if (tier === 'Silver') petMessage += ` You unlocked Silver Saver Tier! 🥈`;
-              if (tier === 'Gold') petMessage += ` You unlocked Gold Guardian Tier! 🥇`;
+              if (tier === 'Pro') petMessage += ` You unlocked Pro Saver Tier! 🥈`;
+              if (tier === 'Legend') petMessage += ` You unlocked Legend Guardian Tier! 🥇`;
             }
           }
 
@@ -747,8 +747,8 @@ const useStoreBase = create<NextGenState>()(
         const newPockets = state.savingsPockets.map(p => {
           if (p.mode === 'growth' && p.riskLevel) {
             let annualRate = RISK_RETURNS[p.riskLevel];
-            if (state.membershipTier === 'Gold') {
-              annualRate += 0.005; // 0.5% yield boost for Gold Tier
+            if (state.membershipTier === 'Legend') {
+              annualRate += 0.005; // 0.5% yield boost for Legend Tier
             }
             // Simulate daily growth (compounded daily for effect)
             const dailyRate = annualRate / 365;
@@ -765,7 +765,7 @@ const useStoreBase = create<NextGenState>()(
           savingsPockets: newPockets,
           lastGrowthSimulationDate: today,
           pet: { 
-            message: `Market update: Your growth pockets earned RM ${totalGrowth.toFixed(2)} today! 📈${state.membershipTier === 'Gold' ? ' (Gold 0.5% Yield Boost Active!)' : ''}`,
+            message: `Market update: Your growth pockets earned RM ${totalGrowth.toFixed(2)} today! 📈${state.membershipTier === 'Legend' ? ' (Legend 0.5% Yield Boost Active!)' : ''}`,
             animation: "excited"
           }
         };
@@ -775,9 +775,9 @@ const useStoreBase = create<NextGenState>()(
         const highest = Math.max(state.highestStreak, nextStreak);
         let tier = state.membershipTier;
         if (nextStreak >= 30) {
-          tier = 'Gold';
+          tier = 'Legend';
         } else if (nextStreak >= 7) {
-          tier = 'Silver';
+          tier = 'Pro';
         }
         return {
           currentStreak: nextStreak,
@@ -791,7 +791,7 @@ const useStoreBase = create<NextGenState>()(
       }),
       resetStreak: () => set((state) => ({
         currentStreak: 0,
-        membershipTier: 'Bronze',
+        membershipTier: 'Novice',
         pet: {
           message: "Streak reset to 0. Every day is a new chance to start saving! 🌱",
           animation: "sad"
@@ -883,22 +883,22 @@ const useStoreBase = create<NextGenState>()(
 
         const highest = Math.max(state.highestStreak, streakUpdated);
         
-        let tier: 'Bronze' | 'Silver' | 'Gold' = 'Bronze';
+        let tier: 'Novice' | 'Pro' | 'Legend' = 'Novice';
         if (streakUpdated >= 30) {
-          tier = 'Gold';
+          tier = 'Legend';
         } else if (streakUpdated >= 7) {
-          tier = 'Silver';
+          tier = 'Pro';
         }
 
         if (tier !== state.membershipTier) {
-          if (tier === 'Silver') {
-            petMessage += ` Graduation! You've unlocked Silver Saver Tier. Access Be U Awfar Nest and merchant perks! 🥈`;
+          if (tier === 'Pro') {
+            petMessage += ` Graduation! You've unlocked Pro Saver Tier. Access Be U Awfar Nest and merchant perks! 🥈`;
             petAnimation = 'happy';
-          } else if (tier === 'Gold') {
-            petMessage += ` Spectacular! You've reached Gold Guardian Tier. Boosted returns and MaxCash active! 🥇`;
+          } else if (tier === 'Legend') {
+            petMessage += ` Spectacular! You've reached Legend Guardian Tier. Boosted returns and MaxCash active! 🥇`;
             petAnimation = 'excited';
-          } else if (tier === 'Bronze') {
-            petMessage += ` You are back to Bronze Budgeter Tier. Keep saving to unlock rewards!`;
+          } else if (tier === 'Novice') {
+            petMessage += ` You are back to Novice Budgeter Tier. Keep saving to unlock rewards!`;
           }
         }
 
@@ -936,11 +936,11 @@ const useStoreBase = create<NextGenState>()(
           nextStreak = 0; // reset back
         }
 
-        let tier: 'Bronze' | 'Silver' | 'Gold' = 'Bronze';
+        let tier: 'Novice' | 'Pro' | 'Legend' = 'Novice';
         if (nextStreak >= 30) {
-          tier = 'Gold';
+          tier = 'Legend';
         } else if (nextStreak >= 7) {
-          tier = 'Silver';
+          tier = 'Pro';
         }
 
         // Add/remove mock transaction for today savings to activate/deactivate the fire
