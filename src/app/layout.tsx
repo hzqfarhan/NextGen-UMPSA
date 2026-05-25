@@ -10,7 +10,14 @@ import { StoreSyncHandler } from "@/components/layout/StoreSyncHandler";
 const inter = { className: "font-sans" };
 
 
+const baseUrl = process.env.NEXT_PUBLIC_APP_URL
+  ? process.env.NEXT_PUBLIC_APP_URL
+  : process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
 export const metadata: Metadata = {
+  metadataBase: new URL(baseUrl),
   title: "BeU NextGen",
   description: "AI-powered financial companion for youth money habits.",
   icons: {
@@ -21,6 +28,24 @@ export const metadata: Metadata = {
   openGraph: {
     title: "BeU NextGen",
     description: "Spend smarter, save better, and understand money before it becomes a problem.",
+    url: "/",
+    siteName: "BeU NextGen",
+    images: [
+      {
+        url: "/assets/NEXTGEN.png",
+        width: 1200,
+        height: 630,
+        alt: "BeU NextGen Logo",
+      },
+    ],
+    locale: "ms_MY",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "BeU NextGen",
+    description: "Spend smarter, save better, and understand money before it becomes a problem.",
+    images: ["/assets/NEXTGEN.png"],
   },
   appleWebApp: {
     title: "BeU NextGen",
