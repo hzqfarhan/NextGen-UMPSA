@@ -8,7 +8,14 @@ export function StoreSyncHandler() {
     const syncFromDB = async () => {
       try {
         const username = useStore.getState().user.name || 'Aiman';
-        const res = await fetch(`/api/sync?username=${username}`);
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+
+        const res = await fetch(`/api/sync?username=${username}`, {
+          signal: controller.signal
+        });
+        clearTimeout(timeoutId);
+
         const data = await res.json();
         if (data.success && data.data) {
           const dbState = data.data;

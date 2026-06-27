@@ -20,7 +20,14 @@ export default function Landing() {
     try {
       useStore.setState((state) => ({ user: { ...state.user, name: finalName } }));
       
-      const res = await fetch(`/api/sync?username=${encodeURIComponent(finalName)}`);
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000); // 3 seconds timeout
+
+      const res = await fetch(`/api/sync?username=${encodeURIComponent(finalName)}`, {
+        signal: controller.signal
+      });
+      clearTimeout(timeoutId);
+
       const data = await res.json();
       
       if (data.success && data.data) {
@@ -34,7 +41,10 @@ export default function Landing() {
       router.push('/setup');
     }
     
-    setIsLoading(false);
+    // We intentionally don't set isLoading(false) if we are routing away, 
+    // to prevent the button from flickering back to normal before the page unloads.
+    // However, if we want to reset it on error so they can try again:
+    // setIsLoading(false);
   };
 
   return (

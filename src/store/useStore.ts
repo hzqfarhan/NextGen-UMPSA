@@ -155,6 +155,7 @@ interface NextGenState {
     name: string;
     type: string;
     monthlyAllowance: number;
+    monthlyIncome: number;
     currentBalance: number;
     nextAllowanceDate: string;
     emergencyFundGoal: number;
@@ -214,6 +215,12 @@ interface NextGenState {
   awfarDrawTickets: number;
   isBimbMigrated: boolean;
   selectedCompanion: string;
+  // Proposal UI States
+  affordItem: string;
+  affordPrice: string;
+  saveDeposit: string;
+  saveTarget: string;
+  selectedPlatform: number | null;
   // Actions
   setShowSpendOnly: (val: boolean) => void;
   setHideBalance: (val: boolean) => void;
@@ -234,7 +241,13 @@ interface NextGenState {
   simulateGrowth: () => void;
   updateNextGenScore: () => void;
   setLanguage: (lang: Language) => void;
+  setMonthlyIncome: (amount: number) => void;
   setSelectedCompanion: (c: string) => void;
+  setAffordItem: (val: string) => void;
+  setAffordPrice: (val: string) => void;
+  setSaveDeposit: (val: string) => void;
+  setSaveTarget: (val: string) => void;
+  setSelectedPlatform: (val: number | null) => void;
   // Gamification Actions
   incrementStreak: () => void;
   resetStreak: () => void;
@@ -352,6 +365,7 @@ export const initialStoreState = {
     name: 'Aiman',
     type: 'Student',
     monthlyAllowance: 800,
+    monthlyIncome: 3000,
     currentBalance: 420,
     nextAllowanceDate: "2026-05-23T05:00:00.000Z",
     emergencyFundGoal: 500,
@@ -403,6 +417,11 @@ export const initialStoreState = {
   awfarDrawTickets: 0,
   isBimbMigrated: false,
   selectedCompanion: 'uteh',
+  affordItem: "",
+  affordPrice: "",
+  saveDeposit: "200",
+  saveTarget: "2500",
+  selectedPlatform: null,
   petOffsets: {
     idle: { offsetY: -3.5, scale: 798 },
     walk: { offsetY: -9.2, scale: 802 },
@@ -422,7 +441,13 @@ const useStoreBase = create<NextGenState>()(
   persist(
     (set, get) => ({
       ...initialStoreState,
+      setMonthlyIncome: (amount) => set((state) => ({ user: { ...state.user, monthlyIncome: amount } })),
       setSelectedCompanion: (c) => set({ selectedCompanion: c }),
+      setAffordItem: (val) => set({ affordItem: val }),
+      setAffordPrice: (val) => set({ affordPrice: val }),
+      setSaveDeposit: (val) => set({ saveDeposit: val }),
+      setSaveTarget: (val) => set({ saveTarget: val }),
+      setSelectedPlatform: (val) => set({ selectedPlatform: val }),
       setShowSpendOnly: (val) => set({ showSpendOnly: val }),
       setHideBalance: (val) => set({ hideBalance: val }),
       addTransaction: (t, skipRoundUp = false) => {
@@ -1257,11 +1282,16 @@ if (typeof window !== 'undefined') {
 
     if (currentSyncStr !== lastSyncStr) {
       lastSyncStr = currentSyncStr;
+      
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 3000);
+
       fetch('/api/sync', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(currentSyncObj)
-      }).catch((err) => console.error('[Zustand DB Sync] error:', err));
+        body: JSON.stringify(currentSyncObj),
+        signal: controller.signal
+      }).then(() => clearTimeout(timeoutId)).catch((err) => console.error('[Zustand DB Sync] error:', err));
     }
   });
 }

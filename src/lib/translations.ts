@@ -129,6 +129,8 @@ type TranslationKeys = {
   coachChipLimit: string
   coachChipSafe: string
   coachChipSave: string
+  coachChipInvest: string
+  coachChipTransfer: string
   billsHeader: string
   billsSubheader: string
   billsProtected: string
@@ -302,6 +304,8 @@ export const t: Record<Language, TranslationKeys> = {
     coachChipLimit: "Can I afford this purchase?",
     coachChipSafe: "What is my Safe Daily Spend?",
     coachChipSave: "Create a savings goal",
+    coachChipInvest: "Should I invest in crypto?",
+    coachChipTransfer: "Pay RM 50 to Aizat",
     billsHeader: "Smart Bill Lock",
     billsSubheader: "Protect rent, bills, goals, and future needs.",
     billsProtected: "Protected",
@@ -473,6 +477,8 @@ export const t: Record<Language, TranslationKeys> = {
     coachChipLimit: "Mampu beli ni ke?",
     coachChipSafe: "Safe Daily Spend saya berapa?",
     coachChipSave: "Cipta matlamat simpanan",
+    coachChipInvest: "Patut ke invest dalam krypto?",
+    coachChipTransfer: "Transfer RM 50 kat Aizat",
     billsHeader: "Smart Bill Lock",
     billsSubheader: "Lindungi sewa, bil, matlamat, dan future needs.",
     billsProtected: "Protected",

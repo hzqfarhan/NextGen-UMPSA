@@ -14,6 +14,8 @@ const FINANCE_KEYWORDS = [
     'streak', 'asb', 'unit trust', 'profit', 'loss', 'withdraw', 'deposit',
     'spending', 'afford', 'interest', 'return', 'growth', 'wallet', 'commit',
     'commitment', 'bnpl', 'autopay', 'insurance', 'tax', 'zakat', 'tabung', 'epf',
+    'duit', 'pitih', 'gaji', 'baki', 'hutang', 'poket', 'simpan', 'keluar',
+    'masuk', 'belanja', 'mahal', 'murah', 'pinjam', 'bayar'
 ];
 
 function isOffTopic(message: string): boolean {
@@ -22,6 +24,22 @@ function isOffTopic(message: string): boolean {
     const hasOffTopic = OFF_TOPIC_PATTERNS.some(p => p.test(lower));
     // Block only if: explicitly off-topic OR no finance keyword found AND message is long enough to be a real query
     return hasOffTopic || (!hasFinanceKeyword && lower.trim().split(' ').length > 3);
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// Prompt Injection Guard
+// ─────────────────────────────────────────────────────────────────────────────
+const INJECTION_PATTERNS = [
+    /ignore (all )?previous/i,
+    /system prompt/i,
+    /you are now/i,
+    /forget (all )?instructions/i,
+    /disregard/i,
+    /bypass/i
+];
+
+function isPromptInjection(message: string): boolean {
+    return INJECTION_PATTERNS.some(p => p.test(message));
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -36,12 +54,15 @@ CRITICAL OUTPUT RULES — YOU MUST FOLLOW EXACTLY:
   "headline": "Short direct answer, max 8 words",
   "status": "good" | "warning" | "critical" | "neutral",
   "insight": "One sentence of actionable advice, max 20 words.",
+  "lesson": "Short 2-sentence explainer teaching a financial concept relevant to the user's query.",
   "metric": { "label": "Metric name", "value": "Value with unit", "trend": "up" | "down" | "flat" } | null,
   "action": "Short CTA text if relevant (e.g. Enable Spend Guard)" | null,
-  "actionType": "toggle_spend_guard" | "go_savings" | "go_bills" | "go_transfer" | null
+  "actionType": "toggle_spend_guard" | "go_savings" | "go_bills" | "go_transfer" | null,
+  "followUps": ["Short follow-up question 1", "Short follow-up question 2"]
 }
 3. If the question is NOT about personal finance, money, savings, bills, debt, or investments:
-   Return: { "headline": "Finance questions only.", "status": "neutral", "insight": "Ask me about your budget, savings, or spending limits.", "metric": null, "action": null, "actionType": null }
+   Return: { "headline": "Finance questions only.", "status": "neutral", "insight": "Ask me about your budget, savings, or spending limits.", "lesson": null, "metric": null, "action": null, "actionType": null, "followUps": [] }
+4. LOCALIZATION & DIALECTS: Automatically detect if the user is using a Malaysian dialect (e.g. Kelantan, Terengganu, Sabah, Sarawak, Utara) or casual slang/Manglish. If a dialect is detected, you MUST write the 'headline', 'insight', and 'action' strictly in that SAME dialect, ensuring cultural nuance and local slang are well represented.
 `;
 
 const AGENT_PROMPTS: Record<string, string> = {
@@ -61,7 +82,14 @@ ${STRUCTURED_SCHEMA}`,
 Warn about BNPL risks. Use RM currency.
 ${STRUCTURED_SCHEMA}`,
 
-    invest: `You are Growth Guru, a wealth-building specialist focused on ASB, unit trusts, and portfolio growth.
+    invest: `You are the Growth Guru. Your goal is to grow the user's wealth. Focus on micro-investing and compound interest.
+    Use REAL Malaysian financial products and data:
+    - ASB (Amanah Saham Bumiputera): ~5.0% - 5.5% annual dividend. Extremely low risk.
+    - Fixed Deposits (FD): ~3.0% - 3.5% p.a. (e.g. Maybank, CIMB).
+    - Roboadvisors (StashAway, Wahed): Target 6% - 8% p.a. for medium/high risk portfolios.
+    - EPF (KWSP) Self-contribution: Historical 5.5% - 6% p.a. Great for retirement.
+    Explain these clearly when asked about investing.
+    If the user has excess cash (safe daily spend > RM 50), strongly recommend putting it to work.
 Always mention risk level (Low/Medium/High). Use RM currency.
 ${STRUCTURED_SCHEMA}`,
 };
@@ -128,15 +156,63 @@ const TOOL_DECLARATIONS = [
             },
             required: ["enable"]
         }
+    },
+    {
+        name: "addTransaction",
+        description: "Logs a new transaction (expense) for the user. Use this when the user says they spent money or bought something.",
+        parameters: {
+            type: "OBJECT",
+            properties: {
+                title: {
+                    type: "STRING",
+                    description: "The name or description of the expense (e.g. Lunch, Grab, Movie)"
+                },
+                amount: {
+                    type: "NUMBER",
+                    description: "The amount spent in RM (e.g. 15.50)"
+                },
+                category: {
+                    type: "STRING",
+                    description: "Category: 'Food', 'Transport', 'Shopping', 'Bills', 'Entertainment', 'Health', 'Other'"
+                }
+            },
+            required: ["title", "amount", "category"]
+        }
     }
 ];
 
 export async function POST(req: NextRequest) {
     try {
-        const { message, agentId, context } = await req.json();
+        // 1.4c Request body size limit
+        const contentLength = parseInt(req.headers.get('content-length') || '0', 10);
+        if (contentLength > 2048) {
+            return NextResponse.json({ error: 'Request too large' }, { status: 413 });
+        }
+
+        const body = await req.json();
+        const { message, agentId, context, history } = body;
 
         if (!message || !agentId) {
             return NextResponse.json({ error: 'Missing message or agentId' }, { status: 400 });
+        }
+
+        if (message.length > 500) {
+            return NextResponse.json({ error: 'Message too long' }, { status: 400 });
+        }
+
+        // 1.4b Server-side prompt injection guard
+        if (isPromptInjection(message)) {
+             return NextResponse.json({
+                structured: {
+                    headline: 'Security Alert',
+                    status: 'critical',
+                    insight: 'Your request violated security policies.',
+                    metric: null,
+                    action: null,
+                    actionType: null,
+                },
+                fallback: false,
+            });
         }
 
         // ── Layer 2: Server-side off-topic guard (free, no API token burned) ──
@@ -184,13 +260,27 @@ export async function POST(req: NextRequest) {
 
         const fullPrompt = message + contextStr;
 
+        // Build history array
+        const contents = [];
+        if (history && Array.isArray(history)) {
+            for (const msg of history) {
+                if (msg.content) {
+                    contents.push({
+                        role: msg.role === 'user' ? 'user' : 'model',
+                        parts: [{ text: msg.content }]
+                    });
+                }
+            }
+        }
+        contents.push({ role: 'user', parts: [{ text: fullPrompt }] });
+
         // Determine which agents should have tool access
         const agentsWithTools = ['save', 'finance'];
         const shouldIncludeTools = agentsWithTools.includes(agentId);
 
         const requestBody: any = {
             system_instruction: { parts: [{ text: systemPrompt }] },
-            contents: [{ role: 'user', parts: [{ text: fullPrompt }] }],
+            contents: contents,
             // Lower temperature for consistent JSON output; small token budget since replies are short
             generationConfig: { maxOutputTokens: 256, temperature: 0.4 },
         };
@@ -200,7 +290,7 @@ export async function POST(req: NextRequest) {
         }
 
         const modelName = process.env.GEMINI_MODEL || 'gemini-2.5-flash';
-        const response = await fetch(
+        let response = await fetch(
             `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${apiKey}`,
             {
                 method: 'POST',
@@ -208,6 +298,23 @@ export async function POST(req: NextRequest) {
                 body: JSON.stringify(requestBody),
             }
         );
+
+        let isFallbackModel = false;
+        
+        // 3.2a Model Cascading on Rate Limit
+        if (!response.ok && response.status === 429) {
+            console.warn(`[AI Chat] Rate limit hit on ${modelName}, cascading to gemini-2.0-flash-lite`);
+            const fallbackModelName = 'gemini-2.0-flash-lite';
+            response = await fetch(
+                `https://generativelanguage.googleapis.com/v1beta/models/${fallbackModelName}:generateContent?key=${apiKey}`,
+                {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(requestBody),
+                }
+            );
+            isFallbackModel = true;
+        }
 
         if (!response.ok) {
             const errBody = await response.text();
@@ -241,6 +348,7 @@ export async function POST(req: NextRequest) {
                     args: functionCallPart.functionCall.args,
                 },
                 fallback: false,
+                isFallbackModel
             });
         }
 
@@ -253,14 +361,14 @@ export async function POST(req: NextRequest) {
             const parsed = JSON.parse(cleaned);
             // Validate it has the expected shape
             if (parsed.headline && parsed.status && parsed.insight !== undefined) {
-                return NextResponse.json({ structured: parsed, fallback: false });
+                return NextResponse.json({ structured: parsed, fallback: false, isFallbackModel });
             }
         } catch {
             // JSON parse failed — fall through to plain text fallback
         }
 
         // Fallback: return as plain reply if JSON parsing fails
-        return NextResponse.json({ reply: rawText, fallback: false });
+        return NextResponse.json({ reply: rawText, fallback: false, isFallbackModel });
 
     } catch (err) {
         console.error('[AI Chat] Internal error:', err);
